@@ -1,0 +1,39 @@
+plugins {
+    id "java-gradle-plugin"
+}
+
+apply plugin: "idea"
+apply plugin: "groovy"
+
+gradlePlugin {
+    plugins {
+        hazelcastPlugin {
+            id = "org.gradle.cache.tasks.hazelcast"
+            implementationClass = "org.gradle.cache.tasks.hazelcast.HazelcastPlugin"
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+task createClasspathManifest {
+    def outputDir = file("$buildDir/$name")
+
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+    }
+}
+
+dependencies {
+    compile "com.hazelcast:hazelcast-client:3.6.4"
+    testCompile "junit:junit:4.12"
+    testCompile "org.spockframework:spock-core:1.0-groovy-2.4@jar"
+    testCompile "com.hazelcast:hazelcast:3.6.4"
+    testRuntime files(createClasspathManifest)
+}

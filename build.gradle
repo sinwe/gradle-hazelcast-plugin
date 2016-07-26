@@ -1,9 +1,16 @@
+import java.text.SimpleDateFormat
+
 plugins {
     id "java-gradle-plugin"
+    id "org.ajoberstar.github-pages" version "1.5.1"
 }
 
 apply plugin: "idea"
 apply plugin: "groovy"
+apply plugin: "maven-publish"
+
+group = "org.gradle.cache.tasks.hazelcast"
+version = "0.1.0-" + new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date())
 
 gradlePlugin {
     plugins {
@@ -11,6 +18,46 @@ gradlePlugin {
             id = "org.gradle.cache.tasks.hazelcast"
             implementationClass = "org.gradle.cache.tasks.hazelcast.HazelcastPlugin"
         }
+    }
+}
+
+def localRepo = file("$buildDir/repo")
+
+publishing {
+    publications {
+        jar(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url localRepo
+        }
+    }
+}
+
+model {
+    tasks {
+        copyFromGhPages(Sync) {
+            dependsOn tasks.prepareGhPages
+            from file("$tasks.prepareGhPages.destinationDir/repo")
+            into localRepo
+        }
+    }
+
+    tasks.publishJarPublicationToMavenRepository {
+        dependsOn tasks.copyFromGhPages
+    }
+
+    tasks.publishGhPages {
+        dependsOn tasks.publish
+    }
+}
+
+githubPages {
+    pages {
+        from localRepo
+        into "repo"
     }
 }
 
@@ -36,4 +83,10 @@ dependencies {
     testCompile "org.spockframework:spock-core:1.0-groovy-2.4@jar"
     testCompile "com.hazelcast:hazelcast:3.6.4"
     testRuntime files(createClasspathManifest)
+}
+
+publishGhPages.doFirst {
+    if (!["git", "status", "--porcelain"].execute().text.trim().empty) {
+        throw new RuntimeException("Won't publish because there are uncommitted changes")
+    }
 }

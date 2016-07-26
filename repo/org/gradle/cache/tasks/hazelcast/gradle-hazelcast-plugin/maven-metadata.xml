@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.gradle.cache.tasks.hazelcast</groupId>
+  <artifactId>gradle-hazelcast-plugin</artifactId>
+  <versioning>
+    <release>0.1.0-20160726-221846</release>
+    <versions>
+      <version>0.1.0-20160726-221045</version>
+      <version>0.1.0-20160726-221246</version>
+      <version>0.1.0-20160726-221846</version>
+    </versions>
+    <lastUpdated>20160726201846</lastUpdated>
+  </versioning>
+</metadata>

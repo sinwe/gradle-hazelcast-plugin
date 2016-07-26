@@ -45,7 +45,7 @@ class IntegrationTest extends Specification {
                     classpath files($CLASSPATH)
                 }
             }
-            apply plugin: org.gradle.cache.tasks.hazelcast.HazelcastPlugin
+            apply plugin: $HazelcastPlugin.name
         """
 
         buildFile << """
@@ -75,18 +75,156 @@ class IntegrationTest extends Specification {
         skippedTasks.containsAll ":compileJava", ":jar"
     }
 
+    def "outputs are correctly loaded from cache"() {
+        buildFile << """
+            apply plugin: "application"
+            mainClassName = "Hello"
+        """
+        succeeds "run"
+        succeeds "clean"
+        expect:
+        succeeds "run"
+    }
+
+    def "tasks get cached when source code changes without changing the compiled output"() {
+        when:
+        succeeds "assemble"
+        then:
+        skippedTasks.empty
+
+        succeeds "clean"
+
+        when:
+        file("src/main/java/Hello.java") << """
+            // Change to source file without compiled result change
+        """
+        succeeds "assemble"
+        then:
+        nonSkippedTasks.contains ":compileJava"
+        skippedTasks.contains ":jar"
+    }
+
+    def "tasks get cached when source code changes back to previous state"() {
+        expect:
+        succeeds "jar"
+        nonSkippedTasks.containsAll ":compileJava", ":jar"
+
+        when:
+        file("src/main/java/Hello.java").text = CHANGED_HELLO_WORLD
+        then:
+        succeeds "jar"
+        nonSkippedTasks.containsAll ":compileJava", ":jar"
+
+        println "\n\n\n-----------------------------------------\n\n\n"
+
+        when:
+        file("src/main/java/Hello.java").text = ORIGINAL_HELLO_WORLD
+        then:
+        succeeds "jar"
+        skippedTasks.containsAll ":compileJava", ":jar"
+    }
+
+    def "jar tasks get cached even when output file is changed"() {
+        testProjectDir.newFile("settings.gradle") << "rootProject.name = 'test'"
+
+        when:
+        succeeds "assemble"
+        then:
+        skippedTasks.empty
+        file("build/libs/test.jar").isFile()
+
+        when:
+        file("build").deleteDir()
+        then:
+        !file("build/libs/test.jar").isFile()
+
+        when:
+        buildFile << """
+            jar {
+                destinationDir = file("build/other-jar")
+                baseName = "other-jar"
+            }
+        """
+
+        succeeds "assemble"
+        then:
+        skippedTasks.contains ":jar"
+        !file("build/libs/test.jar").isFile()
+        file("build/other-jar/other-jar.jar").isFile()
+    }
+
+    def "clean doesn't get cached"() {
+        succeeds "assemble"
+        succeeds "clean"
+        succeeds "assemble"
+        when:
+        succeeds "clean"
+        then:
+        nonSkippedTasks.contains ":clean"
+    }
+
+    def "cacheable task with cache disabled doesn't get cached"() {
+        buildFile << """
+            compileJava.outputs.cacheIf { false }
+        """
+
+        succeeds "compileJava"
+        succeeds "clean"
+
+        when:
+        succeeds "compileJava"
+        then:
+        // :compileJava is not cached, but :jar is still cached as its inputs haven't changed
+        nonSkippedTasks.contains ":compileJava"
+    }
+
+    def "non-cacheable task with cache enabled gets cached"() {
+        testProjectDir.newFile("input.txt") << "data"
+        buildFile << """
+            class NonCacheableTask extends DefaultTask {
+                @InputFile inputFile
+                @OutputFile outputFile
+
+                @TaskAction copy() {
+                    project.mkdir outputFile.parentFile
+                    outputFile.text = inputFile.text
+                }
+            }
+            task customTask(type: NonCacheableTask) {
+                inputFile = file("input.txt")
+                outputFile = file("\$buildDir/output.txt")
+                outputs.cacheIf { true }
+            }
+            compileJava.dependsOn customTask
+        """
+
+        when:
+        succeeds "jar"
+        then:
+        nonSkippedTasks.contains ":customTask"
+
+        when:
+        succeeds "clean"
+        succeeds "jar"
+        then:
+        skippedTasks.contains ":customTask"
+    }
+
     BuildResult succeeds(String... tasks) {
-        arguments.addAll "-Dorg.gradle.cache.tasks=true", "--init-script", "init.gradle"
+        arguments.addAll "-Dorg.gradle.cache.tasks=true", "--init-script", "init.gradle", "--stacktrace"
         arguments.addAll tasks
         def result = GradleRunner.create()
             .forwardOutput()
             .withProjectDir(testProjectDir.root)
             .withArguments(arguments)
-            .withPluginClasspath()
             .build()
         assert result.taskPaths(FAILED).empty
         skippedTasks = result.taskPaths(UP_TO_DATE) + result.taskPaths(SKIPPED)
         nonSkippedTasks = result.taskPaths(SUCCESS)
         return result
+    }
+
+    File file(String path) {
+        return new File(testProjectDir.root, path)
     }
 }

@@ -12,6 +12,7 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 
 class IntegrationTest extends Specification {
+    public static final int HAZELCAST_PORT = 5710
     public static final String ORIGINAL_HELLO_WORLD = """
             public class Hello {
                 public static void main(String... args) {
@@ -34,7 +35,7 @@ class IntegrationTest extends Specification {
     List<String> skippedTasks
     List<String> nonSkippedTasks
 
-    @Rule HazelcastService hazelcastService = new HazelcastService();
+    @Rule HazelcastService hazelcastService = new HazelcastService(HAZELCAST_PORT);
 
     def setup() {
         buildFile = testProjectDir.newFile("build.gradle")
@@ -211,7 +212,10 @@ class IntegrationTest extends Specification {
     }
 
     BuildResult succeeds(String... tasks) {
-        arguments.addAll "-Dorg.gradle.cache.tasks=true", "--init-script", "init.gradle", "--stacktrace"
+        arguments.add "-Dorg.gradle.cache.tasks=true"
+        arguments.add "-Dorg.gradle.cache.tasks.hazelcast.port=" + HAZELCAST_PORT
+        arguments.addAll "--init-script", "init.gradle"
+        arguments.add "--stacktrace"
         arguments.addAll tasks
         def result = GradleRunner.create()
             .forwardOutput()

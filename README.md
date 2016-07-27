@@ -1,5 +1,7 @@
 # Gradle Hazelcast cache backend plugin
 
+[![Build Status](https://travis-ci.org/gradle/gradle-hazelcast-plugin.svg?branch=master)](https://travis-ci.org/gradle/gradle-hazelcast-plugin)
+
 An [init-script plugin](https://docs.gradle.org/current/userguide/init_scripts.html#N14C1D) that enables task output caching in Gradle with a [Hazelcast](http://hazelcast.org) node as the backend.
 
 ## How to use

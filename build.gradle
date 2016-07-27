@@ -12,6 +12,9 @@ apply plugin: "maven-publish"
 group = "org.gradle.cache.tasks.hazelcast"
 version = "0.1.0-" + new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date())
 
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
+
 gradlePlugin {
     plugins {
         hazelcastPlugin {

@@ -5,6 +5,7 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
+import org.gradle.api.internal.GradleInternal;
 import org.gradle.api.internal.tasks.cache.MapBasedTaskOutputCache;
 import org.gradle.api.internal.tasks.cache.TaskOutputCache;
 import org.gradle.api.internal.tasks.cache.TaskOutputCacheFactory;
@@ -13,7 +14,7 @@ import org.gradle.api.invocation.Gradle;
 public class HazelcastPlugin implements Plugin<Gradle> {
     @Override
     public void apply(Gradle gradle) {
-        gradle.getTaskCaching().useCacheFactory(new TaskOutputCacheFactory() {
+        ((GradleInternal) gradle).getTaskCaching().useCacheFactory(new TaskOutputCacheFactory() {
             @Override
             public TaskOutputCache createCache(StartParameter startParameter) {
                 ClientConfig config = new ClientConfig();

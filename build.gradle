@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat
 
 plugins {
     id "java-gradle-plugin"
-    id "org.ajoberstar.github-pages" version "1.5.1"
+    id "com.jfrog.artifactory" version "4.4.4"
 }
 
 apply plugin: "idea"
@@ -10,7 +10,7 @@ apply plugin: "groovy"
 apply plugin: "maven-publish"
 
 group = "org.gradle.cache.tasks.hazelcast"
-version = "0.1.0-" + new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date())
+version = "0.1.1-SNAPSHOT"
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
@@ -31,36 +31,6 @@ publishing {
         jar(MavenPublication) {
             from components.java
         }
-    }
-    repositories {
-        maven {
-            url localRepo
-        }
-    }
-}
-
-model {
-    tasks {
-        copyFromGhPages(Sync) {
-            dependsOn tasks.prepareGhPages
-            from file("$tasks.prepareGhPages.destinationDir/repo")
-            into localRepo
-        }
-    }
-
-    tasks.publishJarPublicationToMavenRepository {
-        dependsOn tasks.copyFromGhPages
-    }
-
-    tasks.publishGhPages {
-        dependsOn tasks.publish
-    }
-}
-
-githubPages {
-    pages {
-        from localRepo
-        into "repo"
     }
 }
 
@@ -88,8 +58,35 @@ dependencies {
     testRuntime files(createClasspathManifest)
 }
 
-publishGhPages.doFirst {
-    if (!["git", "status", "--porcelain"].execute().text.trim().empty) {
-        throw new RuntimeException("Won't publish because there are uncommitted changes")
+// --- Configure publications ------------------------------------------
+
+def buildTagFor(String version) {
+    switch (version.substring(version.lastIndexOf("-") + 1)) {
+        case "SNAPSHOT":
+            return "snapshot"
+        case ~/M\d+[a-z]*$/:
+            return "milestone"
+        default:
+            return "release"
+    }
+}
+
+def targetRepoKey = "libs-${buildTagFor(project.version)}s-local"
+
+artifactory {
+    contextUrl = "https://repo.gradle.org/gradle"
+    publish {
+        repository {
+            repoKey = targetRepoKey
+            username = project.findProperty("artifactory_user") ?: "nouser"
+            password = project.findProperty("artifactory_password") ?: "nopass"
+            maven = true
+        }
+        defaults {
+            publications("jar")
+        }
+    }
+    resolve {
+        repoKey = "repo"
     }
 }

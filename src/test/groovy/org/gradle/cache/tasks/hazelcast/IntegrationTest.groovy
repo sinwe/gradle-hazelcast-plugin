@@ -41,6 +41,8 @@ class IntegrationTest extends Specification {
         buildFile = testProjectDir.newFile("build.gradle")
 
         testProjectDir.newFile("init.gradle") << """
+            gradle.startParameter.taskOutputCacheEnabled = true
+
             initscript {
                 dependencies {
                     classpath files($CLASSPATH)
@@ -212,7 +214,6 @@ class IntegrationTest extends Specification {
     }
 
     BuildResult succeeds(String... tasks) {
-        arguments.add "-Dorg.gradle.cache.tasks=true"
         arguments.add "-Dorg.gradle.cache.tasks.hazelcast.port=" + HAZELCAST_PORT
         arguments.addAll "--init-script", "init.gradle"
         arguments.add "--stacktrace"

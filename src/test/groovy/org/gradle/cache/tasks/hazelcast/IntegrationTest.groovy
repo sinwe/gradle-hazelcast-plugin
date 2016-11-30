@@ -7,9 +7,8 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
-import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
+import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 
 class IntegrationTest extends Specification {
     public static final int HAZELCAST_PORT = 5710
@@ -32,10 +31,10 @@ class IntegrationTest extends Specification {
     @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
     final arguments = []
     File buildFile
-    List<String> skippedTasks
-    List<String> nonSkippedTasks
+    List<String> cachedTasks
+    List<String> executedTasks
 
-    @Rule HazelcastService hazelcastService = new HazelcastService(HAZELCAST_PORT);
+    @Rule HazelcastService hazelcastService = new HazelcastService(HAZELCAST_PORT)
 
     def setup() {
         buildFile = testProjectDir.newFile("build.gradle")
@@ -67,7 +66,7 @@ class IntegrationTest extends Specification {
         when:
         succeeds "jar"
         then:
-        skippedTasks.empty
+        cachedTasks.empty
 
         expect:
         succeeds "clean"
@@ -75,7 +74,7 @@ class IntegrationTest extends Specification {
         when:
         succeeds "jar"
         then:
-        skippedTasks.containsAll ":compileJava", ":jar"
+        cachedTasks.containsAll ":compileJava", ":jar"
     }
 
     def "outputs are correctly loaded from cache"() {
@@ -93,7 +92,7 @@ class IntegrationTest extends Specification {
         when:
         succeeds "assemble"
         then:
-        skippedTasks.empty
+        cachedTasks.empty
 
         succeeds "clean"
 
@@ -103,20 +102,20 @@ class IntegrationTest extends Specification {
         """
         succeeds "assemble"
         then:
-        nonSkippedTasks.contains ":compileJava"
-        skippedTasks.contains ":jar"
+        executedTasks.contains ":compileJava"
+        cachedTasks.contains ":jar"
     }
 
     def "tasks get cached when source code changes back to previous state"() {
         expect:
         succeeds "jar"
-        nonSkippedTasks.containsAll ":compileJava", ":jar"
+        executedTasks.containsAll ":compileJava", ":jar"
 
         when:
         file("src/main/java/Hello.java").text = CHANGED_HELLO_WORLD
         then:
         succeeds "jar"
-        nonSkippedTasks.containsAll ":compileJava", ":jar"
+        executedTasks.containsAll ":compileJava", ":jar"
 
         println "\n\n\n-----------------------------------------\n\n\n"
 
@@ -124,7 +123,7 @@ class IntegrationTest extends Specification {
         file("src/main/java/Hello.java").text = ORIGINAL_HELLO_WORLD
         then:
         succeeds "jar"
-        skippedTasks.containsAll ":compileJava", ":jar"
+        cachedTasks.containsAll ":compileJava", ":jar"
     }
 
     def "jar tasks get cached even when output file is changed"() {
@@ -133,7 +132,7 @@ class IntegrationTest extends Specification {
         when:
         succeeds "assemble"
         then:
-        skippedTasks.empty
+        cachedTasks.empty
         file("build/libs/test.jar").isFile()
 
         when:
@@ -151,7 +150,7 @@ class IntegrationTest extends Specification {
 
         succeeds "assemble"
         then:
-        skippedTasks.contains ":jar"
+        cachedTasks.contains ":jar"
         !file("build/libs/test.jar").isFile()
         file("build/other-jar/other-jar.jar").isFile()
     }
@@ -163,7 +162,7 @@ class IntegrationTest extends Specification {
         when:
         succeeds "clean"
         then:
-        nonSkippedTasks.contains ":clean"
+        executedTasks.contains ":clean"
     }
 
     def "cacheable task with cache disabled doesn't get cached"() {
@@ -178,7 +177,7 @@ class IntegrationTest extends Specification {
         succeeds "compileJava"
         then:
         // :compileJava is not cached, but :jar is still cached as its inputs haven't changed
-        nonSkippedTasks.contains ":compileJava"
+        executedTasks.contains ":compileJava"
     }
 
     def "non-cacheable task with cache enabled gets cached"() {
@@ -204,13 +203,13 @@ class IntegrationTest extends Specification {
         when:
         succeeds "jar"
         then:
-        nonSkippedTasks.contains ":customTask"
+        executedTasks.contains ":customTask"
 
         when:
         succeeds "clean"
         succeeds "jar"
         then:
-        skippedTasks.contains ":customTask"
+        cachedTasks.contains ":customTask"
     }
 
     BuildResult succeeds(String... tasks) {
@@ -224,8 +223,8 @@ class IntegrationTest extends Specification {
             .withArguments(arguments)
             .build()
         assert result.taskPaths(FAILED).empty
-        skippedTasks = result.taskPaths(UP_TO_DATE) + result.taskPaths(SKIPPED)
-        nonSkippedTasks = result.taskPaths(SUCCESS)
+        cachedTasks = result.taskPaths(FROM_CACHE)
+        executedTasks = result.taskPaths(SUCCESS)
         return result
     }
 

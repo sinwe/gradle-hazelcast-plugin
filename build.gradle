@@ -1,8 +1,6 @@
-import java.text.SimpleDateFormat
-
 plugins {
     id "java-gradle-plugin"
-    id "com.jfrog.artifactory" version "4.4.4"
+    id "com.jfrog.artifactory" version "4.4.9"
 }
 
 apply plugin: "idea"

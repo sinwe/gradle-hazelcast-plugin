@@ -7,9 +7,9 @@ import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
 import org.gradle.api.internal.GradleInternal;
 import org.gradle.api.invocation.Gradle;
-import org.gradle.cache.BuildCache;
-import org.gradle.cache.BuildCacheFactory;
-import org.gradle.cache.MapBasedBuildCache;
+import org.gradle.caching.BuildCache;
+import org.gradle.caching.MapBasedBuildCache;
+import org.gradle.caching.internal.BuildCacheFactory;
 
 public class HazelcastPlugin implements Plugin<Gradle> {
     @Override

@@ -7,7 +7,7 @@ apply plugin: "idea"
 apply plugin: "groovy"
 apply plugin: "maven-publish"
 
-group = "org.gradle.cache.tasks.hazelcast"
+group = "org.gradle.caching.hazelcast"
 version = "0.5-SNAPSHOT"
 
 sourceCompatibility = "1.7"

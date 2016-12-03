@@ -1,4 +1,4 @@
-package org.gradle.cache.tasks.hazelcast;
+package org.gradle.caching.hazelcast;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.core.*;

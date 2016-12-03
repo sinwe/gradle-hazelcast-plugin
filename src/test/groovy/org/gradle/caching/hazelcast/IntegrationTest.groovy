@@ -1,4 +1,4 @@
-package org.gradle.cache.tasks.hazelcast
+package org.gradle.caching.hazelcast
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner

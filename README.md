@@ -2,14 +2,14 @@
 
 [![Build Status](https://travis-ci.org/gradle/gradle-hazelcast-plugin.svg?branch=master)](https://travis-ci.org/gradle/gradle-hazelcast-plugin)
 
-An [init-script plugin](https://docs.gradle.org/current/userguide/init_scripts.html#N14C1D) that enables task output caching in Gradle with a [Hazelcast](http://hazelcast.org) node as the backend.
+A [settings](https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html) that enables build caching in Gradle with a [Hazelcast](http://hazelcast.org) node as the backend. The Hazelcast node itself needs to be set up separately.
 
 ## How to use
 
-Create `init-hazelcast.gradle` in your `$GRADLE_HOME/init.d` directory:
+Add this to your `settings.gradle`:
 
 ```groovy
-initscript {
+buildscript {
   repositories {
     maven { url "https://gradle.github.io/gradle-hazelcast-plugin/repo/" }
     mavenCentral()
@@ -21,9 +21,21 @@ initscript {
 }
 
 apply plugin: org.gradle.caching.hazelcast.HazelcastPlugin
+
+buildCache {
+  // Disable local cache, as Hazelcast will serve as both local and remote
+  local {
+    enabled = false
+  }
+  remote(org.gradle.caching.hazelcast.HazelcastBuildCache) {
+    host = "127.0.0.1"
+    port = 5701
+    name = "gradle-build-cache"
+  }
+}
 ```
 
-You can specify the location and name of the Hazelcast cache. To do this, you can use these system properties:
+You can also specify the location and name of the Hazelcast cache via system properties (though values specified in the `settings.gradle` override the ones specified by system properties):
 
 System property                     | Function                        | Default value
 ----------------------------------- | ------------------------------- | ------------

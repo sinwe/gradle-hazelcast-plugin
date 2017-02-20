@@ -39,15 +39,26 @@ class IntegrationTest extends Specification {
     def setup() {
         buildFile = testProjectDir.newFile("build.gradle")
 
-        testProjectDir.newFile("init.gradle") << """
+        testProjectDir.newFile("settings.gradle") << """
+            rootProject.name = 'test'
             gradle.startParameter.taskOutputCacheEnabled = true
 
-            initscript {
+            buildscript {
                 dependencies {
                     classpath files($CLASSPATH)
                 }
             }
             apply plugin: $HazelcastPlugin.name
+
+            buildCache {
+                // Disable local cache, as Hazelcast will serve as both local and remote
+                local {
+                  enabled = false
+                }
+                remote($HazelcastBuildCache.name) {
+                    port = $HAZELCAST_PORT
+                }
+            }
         """
 
         buildFile << """
@@ -127,8 +138,6 @@ class IntegrationTest extends Specification {
     }
 
     def "jar tasks get cached even when output file is changed"() {
-        testProjectDir.newFile("settings.gradle") << "rootProject.name = 'test'"
-
         when:
         succeeds "assemble"
         then:
@@ -213,8 +222,6 @@ class IntegrationTest extends Specification {
     }
 
     BuildResult succeeds(String... tasks) {
-        arguments.add "-Dorg.gradle.caching.hazelcast.port=" + HAZELCAST_PORT
-        arguments.addAll "--init-script", "init.gradle"
         arguments.add "--stacktrace"
         arguments.addAll tasks
         def result = GradleRunner.create()

@@ -11,7 +11,7 @@ Add this to your `settings.gradle`:
 ```groovy
 buildscript {
   repositories {
-    maven { url "https://repo.gradle.org/libs/" }
+    maven { url "https://repo.gradle.org/gradle/libs/" }
     mavenCentral()
   }
 

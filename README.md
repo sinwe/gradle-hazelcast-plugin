@@ -11,12 +11,12 @@ Add this to your `settings.gradle`:
 ```groovy
 buildscript {
   repositories {
-    maven { url "https://gradle.github.io/gradle-hazelcast-plugin/repo/" }
+    maven { url "https://repo.gradle.org/libs/" }
     mavenCentral()
   }
 
   dependencies {
-    classpath "org.gradle.caching.hazelcast:gradle-hazelcast-plugin:0.1.+"
+    classpath "org.gradle.caching.hazelcast:gradle-hazelcast-plugin:0.6"
   }
 }
 

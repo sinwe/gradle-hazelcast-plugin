@@ -213,7 +213,7 @@ class IntegrationTest extends Specification {
     }
 
     BuildResult succeeds(String... tasks) {
-        arguments.add "-Dorg.gradle.cache.tasks.hazelcast.port=" + HAZELCAST_PORT
+        arguments.add "-Dorg.gradle.caching.hazelcast.port=" + HAZELCAST_PORT
         arguments.addAll "--init-script", "init.gradle"
         arguments.add "--stacktrace"
         arguments.addAll tasks

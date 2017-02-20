@@ -16,7 +16,7 @@ targetCompatibility = "1.7"
 gradlePlugin {
     plugins {
         hazelcastPlugin {
-            id = "org.gradle.cache.tasks.hazelcast"
+            id = "org.gradle.caching.hazelcast"
             implementationClass = "HazelcastPlugin"
         }
     }

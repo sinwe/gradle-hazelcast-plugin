@@ -18,9 +18,9 @@ public class HazelcastPlugin implements Plugin<Gradle> {
             @Override
             public BuildCache createCache(StartParameter startParameter) {
                 ClientConfig config = new ClientConfig();
-                String host = System.getProperty("org.gradle.cache.tasks.hazelcast.host", "127.0.0.1");
-                String port = System.getProperty("org.gradle.cache.tasks.hazelcast.port", "5701");
-                String name = System.getProperty("org.gradle.cache.tasks.hazelcast.name", "gradle-task-cache");
+                String host = System.getProperty("org.gradle.caching.hazelcast.host", "127.0.0.1");
+                String port = System.getProperty("org.gradle.caching.hazelcast.port", "5701");
+                String name = System.getProperty("org.gradle.caching.hazelcast.name", "gradle-task-cache");
                 String address = host + ":" + port;
                 config.getNetworkConfig().addAddress(address);
                 final HazelcastInstance instance = HazelcastClient.newHazelcastClient(config);

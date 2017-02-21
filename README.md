@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/gradle/gradle-hazelcast-plugin.svg?branch=master)](https://travis-ci.org/gradle/gradle-hazelcast-plugin)
 
-A [settings](https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html) that enables build caching in Gradle with a [Hazelcast](http://hazelcast.org) node as the backend. The Hazelcast node itself needs to be set up separately.
+A [settings plugin](https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html) that enables build caching in Gradle with a [Hazelcast](http://hazelcast.org) node as the backend. The Hazelcast node itself needs to be set up separately.
 
 ## How to use
 

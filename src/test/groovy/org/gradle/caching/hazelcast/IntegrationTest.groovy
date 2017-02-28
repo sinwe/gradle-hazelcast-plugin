@@ -53,7 +53,7 @@ class IntegrationTest extends Specification {
             buildCache {
                 // Disable local cache, as Hazelcast will serve as both local and remote
                 local {
-                  enabled = false
+                    enabled = false
                 }
                 remote($HazelcastBuildCache.name) {
                     port = $HAZELCAST_PORT

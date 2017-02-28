@@ -3,6 +3,23 @@ package org.gradle.caching.hazelcast;
 import com.hazelcast.util.Preconditions;
 import org.gradle.caching.configuration.AbstractBuildCache;
 
+/**
+ * Build cache configuration for Hazelcast backends. Pushing to this cache is enabled by default.
+ *
+ * <p>Configuration via {@code settings.gradle}:</p>
+ *
+ * <pre>
+ * buildCache {
+ *     local {
+ *         // Disable local cache, as Hazelcast will serve as both local and remote
+ *         enabled = false
+ *     }
+ *     remote(org.gradle.caching.hazelcast.HazelcastBuildCache) {
+ *         // ...
+ *     }
+ * }
+ * </pre>
+ */
 public class HazelcastBuildCache extends AbstractBuildCache {
 
     private String name;
@@ -13,6 +30,8 @@ public class HazelcastBuildCache extends AbstractBuildCache {
         this.host = System.getProperty("org.gradle.caching.hazelcast.host", "127.0.0.1");
         this.port = getPortValue();
         this.name = System.getProperty("org.gradle.caching.hazelcast.name", "gradle-task-cache");
+        // Allow pushing by default
+        setPush(true);
     }
 
     private static int getPortValue() {

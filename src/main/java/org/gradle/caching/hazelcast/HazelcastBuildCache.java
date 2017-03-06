@@ -30,8 +30,6 @@ public class HazelcastBuildCache extends AbstractBuildCache {
         this.host = System.getProperty("org.gradle.caching.hazelcast.host", "127.0.0.1");
         this.port = getPortValue();
         this.name = System.getProperty("org.gradle.caching.hazelcast.name", "gradle-task-cache");
-        // Allow pushing by default
-        setPush(true);
     }
 
     private static int getPortValue() {

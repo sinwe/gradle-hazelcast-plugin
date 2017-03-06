@@ -41,7 +41,6 @@ class IntegrationTest extends Specification {
 
         testProjectDir.newFile("settings.gradle") << """
             rootProject.name = 'test'
-            gradle.startParameter.taskOutputCacheEnabled = true
 
             buildscript {
                 dependencies {
@@ -51,10 +50,6 @@ class IntegrationTest extends Specification {
             apply plugin: $HazelcastPlugin.name
 
             buildCache {
-                // Disable local cache, as Hazelcast will serve as both local and remote
-                local {
-                    enabled = false
-                }
                 remote($HazelcastBuildCache.name) {
                     port = $HAZELCAST_PORT
                 }
@@ -75,7 +70,7 @@ class IntegrationTest extends Specification {
 
     def "no task is re-executed when inputs are unchanged"() {
         when:
-        succeeds "jar"
+        succeeds "compileJava"
         then:
         cachedTasks.empty
 
@@ -83,9 +78,9 @@ class IntegrationTest extends Specification {
         succeeds "clean"
 
         when:
-        succeeds "jar"
+        succeeds "compileJava"
         then:
-        cachedTasks.containsAll ":compileJava", ":jar"
+        cachedTasks.containsAll ":compileJava"
     }
 
     def "outputs are correctly loaded from cache"() {
@@ -99,69 +94,24 @@ class IntegrationTest extends Specification {
         succeeds "run"
     }
 
-    def "tasks get cached when source code changes without changing the compiled output"() {
-        when:
-        succeeds "assemble"
-        then:
-        cachedTasks.empty
-
-        succeeds "clean"
-
-        when:
-        file("src/main/java/Hello.java") << """
-            // Change to source file without compiled result change
-        """
-        succeeds "assemble"
-        then:
-        executedTasks.contains ":compileJava"
-        cachedTasks.contains ":jar"
-    }
-
     def "tasks get cached when source code changes back to previous state"() {
         expect:
-        succeeds "jar"
-        executedTasks.containsAll ":compileJava", ":jar"
+        succeeds "compileJava"
+        executedTasks.containsAll ":compileJava"
 
         when:
         file("src/main/java/Hello.java").text = CHANGED_HELLO_WORLD
         then:
-        succeeds "jar"
-        executedTasks.containsAll ":compileJava", ":jar"
+        succeeds "compileJava"
+        executedTasks.containsAll ":compileJava"
 
         println "\n\n\n-----------------------------------------\n\n\n"
 
         when:
         file("src/main/java/Hello.java").text = ORIGINAL_HELLO_WORLD
         then:
-        succeeds "jar"
-        cachedTasks.containsAll ":compileJava", ":jar"
-    }
-
-    def "jar tasks get cached even when output file is changed"() {
-        when:
-        succeeds "assemble"
-        then:
-        cachedTasks.empty
-        file("build/libs/test.jar").isFile()
-
-        when:
-        file("build").deleteDir()
-        then:
-        !file("build/libs/test.jar").isFile()
-
-        when:
-        buildFile << """
-            jar {
-                destinationDir = file("build/other-jar")
-                baseName = "other-jar"
-            }
-        """
-
-        succeeds "assemble"
-        then:
-        cachedTasks.contains ":jar"
-        !file("build/libs/test.jar").isFile()
-        file("build/other-jar/other-jar.jar").isFile()
+        succeeds "compileJava"
+        cachedTasks.containsAll ":compileJava"
     }
 
     def "clean doesn't get cached"() {
@@ -210,18 +160,19 @@ class IntegrationTest extends Specification {
         """
 
         when:
-        succeeds "jar"
+        succeeds "compileJava"
         then:
         executedTasks.contains ":customTask"
 
         when:
         succeeds "clean"
-        succeeds "jar"
+        succeeds "compileJava"
         then:
         cachedTasks.contains ":customTask"
     }
 
     BuildResult succeeds(String... tasks) {
+        arguments.add "--build-cache"
         arguments.add "--stacktrace"
         arguments.addAll tasks
         def result = GradleRunner.create()

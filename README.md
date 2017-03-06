@@ -16,7 +16,7 @@ buildscript {
   }
 
   dependencies {
-    classpath "org.gradle.caching.hazelcast:gradle-hazelcast-plugin:0.7"
+    classpath "org.gradle.caching.hazelcast:gradle-hazelcast-plugin:0.8"
   }
 }
 

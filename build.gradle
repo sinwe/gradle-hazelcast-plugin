@@ -8,7 +8,7 @@ apply plugin: "groovy"
 apply plugin: "maven-publish"
 
 group = "org.gradle.caching.hazelcast"
-version = "0.8-SNAPSHOT"
+version = "0.8"
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"

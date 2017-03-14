@@ -50,7 +50,7 @@ class IntegrationTest extends Specification {
             apply plugin: $HazelcastPlugin.name
 
             buildCache {
-                remote($HazelcastBuildCache.name) {
+                local($HazelcastBuildCache.name) {
                     port = $HAZELCAST_PORT
                 }
             }

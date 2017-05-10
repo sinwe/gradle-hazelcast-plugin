@@ -26,16 +26,19 @@ public class HazelcastPlugin implements Plugin<Settings> {
 
     static class HazelcastBuildCacheServiceFactory implements BuildCacheServiceFactory<HazelcastBuildCache> {
         @Override
-        public BuildCacheService createBuildCacheService(HazelcastBuildCache cacheConfig) {
+        public BuildCacheService createBuildCacheService(HazelcastBuildCache cacheConfig, Describer describer) {
 			ClientConfig config = new ClientConfig();
 			String address = cacheConfig.getHost() + ":" + cacheConfig.getPort();
 			String name = cacheConfig.getName();
 			config.getNetworkConfig().addAddress(address);
-			final HazelcastInstance instance = HazelcastClient.newHazelcastClient(config);
-			return new MapBasedBuildCacheService(
-				String.format("Hazelcast node '%s' at %s", name, address),
-				instance.<String, byte[]>getMap(name)
-			);
+			HazelcastInstance instance = HazelcastClient.newHazelcastClient(config);
+
+			describer
+                .type("Hazelcast")
+			    .config("name", name)
+                .config("address", address);
+
+			return new MapBasedBuildCacheService(instance.<String, byte[]>getMap(name));
 		}
     }
 }

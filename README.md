@@ -23,14 +23,12 @@ buildscript {
 apply plugin: org.gradle.caching.hazelcast.HazelcastPlugin
 
 buildCache {
-  // Disable local cache, as Hazelcast will serve as both local and remote
-  local {
-    enabled = false
-  }
+  // Note: the local cache is disabled by default when applying the plugin
   remote(org.gradle.caching.hazelcast.HazelcastBuildCache) {
     host = "127.0.0.1"
     port = 5701
     name = "gradle-build-cache"
+    // Note: push is enabled by default when applying the pluign
   }
 }
 ```

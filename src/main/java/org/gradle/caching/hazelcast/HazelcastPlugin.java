@@ -20,8 +20,10 @@ public class HazelcastPlugin implements Plugin<Settings> {
     public void apply(Settings settings) {
         BuildCacheConfiguration buildCacheConfiguration = settings.getBuildCache();
         buildCacheConfiguration.registerBuildCacheService(HazelcastBuildCache.class, HazelcastBuildCacheServiceFactory.class);
-        // Use Hazelcast as local cache
-        buildCacheConfiguration.local(HazelcastBuildCache.class);
+        // Use Hazelcast as remote cache and disable local cache
+        buildCacheConfiguration.getLocal().setEnabled(false);
+        HazelcastBuildCache cache = buildCacheConfiguration.remote(HazelcastBuildCache.class);
+        cache.setPush(true);
     }
 
     static class HazelcastBuildCacheServiceFactory implements BuildCacheServiceFactory<HazelcastBuildCache> {

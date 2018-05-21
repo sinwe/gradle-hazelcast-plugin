@@ -28,7 +28,8 @@ buildCache {
     host = "127.0.0.1"
     port = 5701
     name = "gradle-build-cache"
-    // Note: push is enabled by default when applying the plugin
+    enabled = true
+    push = true
   }
 }
 ```

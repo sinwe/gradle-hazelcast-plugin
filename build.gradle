@@ -17,7 +17,7 @@ gradlePlugin {
     plugins {
         hazelcastPlugin {
             id = "org.gradle.caching.hazelcast"
-            implementationClass = "HazelcastPlugin"
+            implementationClass = "org.gradle.caching.hazelcast.HazelcastPlugin"
         }
     }
 }

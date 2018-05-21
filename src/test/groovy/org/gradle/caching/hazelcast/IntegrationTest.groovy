@@ -52,6 +52,7 @@ class IntegrationTest extends Specification {
             buildCache {
                 remote($HazelcastBuildCache.name) {
                     port = $HAZELCAST_PORT
+                    push = true
                 }
             }
         """

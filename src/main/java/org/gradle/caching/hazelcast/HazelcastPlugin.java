@@ -10,6 +10,10 @@ import org.gradle.caching.BuildCacheServiceFactory;
 import org.gradle.caching.MapBasedBuildCacheService;
 import org.gradle.caching.configuration.BuildCacheConfiguration;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * {@link Settings} plugin to register Hazelcast as a build cache backend.
  *
@@ -30,17 +34,22 @@ public class HazelcastPlugin implements Plugin<Settings> {
         @Override
         public BuildCacheService createBuildCacheService(HazelcastBuildCache cacheConfig, Describer describer) {
 			ClientConfig config = new ClientConfig();
-			String address = cacheConfig.getHost() + ":" + cacheConfig.getPort();
-			String name = cacheConfig.getName();
-			config.getNetworkConfig().addAddress(address);
+            int port = cacheConfig.getPort();
+            List<String> addressList = Stream.of(cacheConfig.getHost()
+                .split(","))
+                .map(String::trim)
+                .map(address -> address + ":" + port)
+                .collect(Collectors.toList());
+            String name = cacheConfig.getName();
+			config.getNetworkConfig().addAddress(addressList.toArray(new String[0]));
 			HazelcastInstance instance = HazelcastClient.newHazelcastClient(config);
 
 			describer
                 .type("Hazelcast")
 			    .config("name", name)
-                .config("address", address);
+                .config("address", addressList.toString());
 
-			return new MapBasedBuildCacheService(instance.<String, byte[]>getMap(name));
+			return new MapBasedBuildCacheService(instance.getMap(name));
 		}
     }
 }

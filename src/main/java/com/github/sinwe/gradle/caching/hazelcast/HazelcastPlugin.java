@@ -10,6 +10,7 @@ import org.gradle.caching.BuildCacheServiceFactory;
 import org.gradle.caching.MapBasedBuildCacheService;
 import org.gradle.caching.configuration.BuildCacheConfiguration;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,17 +22,17 @@ import java.util.stream.Stream;
  */
 public class HazelcastPlugin implements Plugin<Settings> {
     @Override
-    public void apply(Settings settings) {
+    public void apply(@Nonnull Settings settings) {
         BuildCacheConfiguration buildCacheConfiguration = settings.getBuildCache();
         buildCacheConfiguration.registerBuildCacheService(HazelcastBuildCache.class, HazelcastBuildCacheServiceFactory.class);
         // Use Hazelcast as remote cache and disable local cache
         buildCacheConfiguration.getLocal().setEnabled(false);
-        HazelcastBuildCache cache = buildCacheConfiguration.remote(HazelcastBuildCache.class);
+        buildCacheConfiguration.remote(HazelcastBuildCache.class);
     }
 
     static class HazelcastBuildCacheServiceFactory implements BuildCacheServiceFactory<HazelcastBuildCache> {
         @Override
-        public BuildCacheService createBuildCacheService(HazelcastBuildCache cacheConfig, Describer describer) {
+        public BuildCacheService createBuildCacheService(@Nonnull HazelcastBuildCache cacheConfig, @Nonnull Describer describer) {
 			ClientConfig config = new ClientConfig();
             int port = cacheConfig.getPort();
             List<String> addressList = Stream.of(cacheConfig.getHost()

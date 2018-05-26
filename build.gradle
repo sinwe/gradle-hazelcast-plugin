@@ -161,3 +161,5 @@ artifacts {
     archives jar
     archives sourcesJar
 }
+
+afterReleaseBuild.dependsOn uploadArchives

@@ -13,20 +13,19 @@ Add this to your `settings.gradle`:
 ```groovy
 buildscript {
   repositories {
-    maven { url "https://repo.gradle.org/gradle/libs/" }
     mavenCentral()
   }
 
   dependencies {
-    classpath "org.gradle.caching.hazelcast:gradle-hazelcast-plugin:0.12"
+    classpath "com.github.sinwe.gradle.caching.hazelcast:gradle-hazelcast-plugin:0.12"
   }
 }
 
-apply plugin: org.gradle.caching.hazelcast.HazelcastPlugin
+apply plugin: com.github.sinwe.gradle.caching.hazelcast.HazelcastPlugin
 
 buildCache {
   // Note: the local cache is disabled by default when applying the plugin
-  remote(org.gradle.caching.hazelcast.HazelcastBuildCache) {
+  remote(com.github.sinwe.gradle.caching.hazelcast.HazelcastBuildCache) {
     host = "127.0.0.1"
     port = 5701
     name = "gradle-build-cache"
@@ -38,8 +37,8 @@ buildCache {
 
 You can also specify the location and name of the Hazelcast cache via system properties (though values specified in the `settings.gradle` override the ones specified by system properties):
 
-System property                     | Function                        | Default value
------------------------------------ | ------------------------------- | ------------
-`org.gradle.caching.hazelcast.host` | host name of the Hazelcast node | `127.0.0.1`
-`org.gradle.caching.hazelcast.port` | TCP port of the Hazelcast node  | `5701`
-`org.gradle.caching.hazelcast.name` | name of the cache               | `gradle-task-cache`
+System property                                  | Function                        | Default value
+------------------------------------------------ | ------------------------------- | ------------
+`com.github.sinwe.gradle.caching.hazelcast.host` | host name of the Hazelcast node | `127.0.0.1`
+`com.github.sinwe.gradle.caching.hazelcast.port` | TCP port of the Hazelcast node  | `5701`
+`com.github.sinwe.gradle.caching.hazelcast.name` | name of the cache               | `gradle-task-cache`

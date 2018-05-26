@@ -1,4 +1,4 @@
-package org.gradle.caching.hazelcast;
+package com.github.sinwe.gradle.caching.hazelcast;
 
 import com.hazelcast.util.Preconditions;
 import org.gradle.caching.configuration.AbstractBuildCache;
@@ -14,7 +14,7 @@ import org.gradle.caching.configuration.AbstractBuildCache;
  *         // Disable local cache, as Hazelcast will serve as both local and remote
  *         enabled = false
  *     }
- *     remote(org.gradle.caching.hazelcast.HazelcastBuildCache) {
+ *     remote(com.github.sinwe.hazelcast.HazelcastBuildCache) {
  *         // ...
  *     }
  * }
@@ -27,13 +27,13 @@ public class HazelcastBuildCache extends AbstractBuildCache {
     private int port;
 
     public HazelcastBuildCache() {
-        this.host = System.getProperty("org.gradle.caching.hazelcast.host", "127.0.0.1");
+        this.host = System.getProperty("com.github.sinwe.gradle.caching.hazelcast.host", "127.0.0.1");
         this.port = getPortValue();
-        this.name = System.getProperty("org.gradle.caching.hazelcast.name", "gradle-task-cache");
+        this.name = System.getProperty("com.github.sinwe.gradle.caching.hazelcast.name", "gradle-task-cache");
     }
 
     private static int getPortValue() {
-        String portString = System.getProperty("org.gradle.caching.hazelcast.port", "5701");
+        String portString = System.getProperty("com.github.sinwe.gradle.caching.hazelcast.port", "5701");
         int portValue;
         try {
             portValue = Integer.parseInt(portString);

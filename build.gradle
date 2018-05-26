@@ -11,7 +11,7 @@ apply plugin: "idea"
 apply plugin: "groovy"
 apply plugin: "maven-publish"
 
-group = "org.gradle.caching.hazelcast"
+group = "com.github.sinwe.gradle.caching.hazelcast"
 version = "0.12-SNAPSHOT"
 
 sourceCompatibility = "1.8"
@@ -20,8 +20,8 @@ targetCompatibility = "1.8"
 gradlePlugin {
     plugins {
         hazelcastPlugin {
-            id = "org.gradle.caching.hazelcast"
-            implementationClass = "org.gradle.caching.hazelcast.HazelcastPlugin"
+            id = "com.github.sinwe.hazelcast"
+            implementationClass = "com.github.sinwe.hazelcast.HazelcastPlugin"
         }
     }
 }

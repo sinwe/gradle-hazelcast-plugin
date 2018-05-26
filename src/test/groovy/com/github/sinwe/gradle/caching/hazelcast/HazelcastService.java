@@ -1,4 +1,4 @@
-package org.gradle.caching.hazelcast;
+package com.github.sinwe.gradle.caching.hazelcast;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.core.*;

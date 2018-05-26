@@ -19,6 +19,7 @@ apply plugin: "maven"
 apply plugin: 'net.researchgate.release'
 
 group = "com.github.sinwe.gradle.caching.hazelcast"
+description = "A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend"
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"

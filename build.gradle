@@ -1,3 +1,7 @@
+buildscript {
+    apply from: file('versions.gradle')
+}
+
 plugins {
     id "java-gradle-plugin"
     id "com.jfrog.artifactory" version "4.4.9"
@@ -49,10 +53,10 @@ task createClasspathManifest {
 }
 
 dependencies {
-    compile "com.hazelcast:hazelcast-client:3.6.4"
-    testCompile "junit:junit:4.12"
+    compile libraries.hazelcastClient
+    testCompile libraries.junit
     testCompile "org.spockframework:spock-core:1.0-groovy-2.4@jar"
-    testCompile "com.hazelcast:hazelcast:3.6.4"
+    testCompile libraries.hazelcast
     testRuntime files(createClasspathManifest)
 }
 

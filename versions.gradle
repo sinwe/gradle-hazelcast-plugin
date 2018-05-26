@@ -1,0 +1,12 @@
+ext {
+    hazelcastVersion    = "3.6.4"
+    junitVersion        = "4.12"
+    spockVersion        = "1.0"
+}
+
+ext.libraries = [
+    hazelcast           : "com.hazelcast:hazelcast:$hazelcastVersion",
+    hazelcastClient     : "com.hazelcast:hazelcast-client:$hazelcastVersion",
+    junit               : "junit:junit:$junitVersion",
+    spockCore           : "org.spockframework:spock-core:$spockVersion-groovy-2.4@jar"
+]

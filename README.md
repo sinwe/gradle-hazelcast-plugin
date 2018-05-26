@@ -17,7 +17,7 @@ buildscript {
   }
 
   dependencies {
-    classpath "com.github.sinwe.gradle.caching.hazelcast:gradle-hazelcast-plugin:0.12"
+    classpath "com.github.sinwe.gradle.caching.hazelcast:gradle-hazelcast-plugin:0.13"
   }
 }
 

@@ -21,7 +21,7 @@ buildscript {
   }
 }
 
-apply plugin: com.github.sinwe.gradle.caching.hazelcast.HazelcastPlugin
+apply plugin: "com.github.sinwe.gradle.caching.hazelcast.HazelcastPlugin"
 
 buildCache {
   // Note: the local cache is disabled by default when applying the plugin

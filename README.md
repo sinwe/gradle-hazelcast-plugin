@@ -26,7 +26,7 @@ apply plugin: "com.github.sinwe.gradle.caching.hazelcast.HazelcastPlugin"
 buildCache {
   // Note: the local cache is disabled by default when applying the plugin
   remote(com.github.sinwe.gradle.caching.hazelcast.HazelcastBuildCache) {
-    host = "127.0.0.1"
+    host = "127.0.0.1"  //support comma separated multiple hosts
     port = 5701
     name = "gradle-build-cache"
     enabled = true

@@ -1,10 +1,12 @@
 ext {
-    hazelcastVersion    = "3.6.4"
-    junitVersion        = "4.12"
-    spockVersion        = "1.0"
+    gradlePluginReleaseVersion  = "2.7.0"
+    hazelcastVersion            = "3.6.4"
+    junitVersion                = "4.12"
+    spockVersion                = "1.0"
 }
 
 ext.libraries = [
+    gradleRelease       : "net.researchgate:gradle-release:$gradlePluginReleaseVersion",
     hazelcast           : "com.hazelcast:hazelcast:$hazelcastVersion",
     hazelcastClient     : "com.hazelcast:hazelcast-client:$hazelcastVersion",
     junit               : "junit:junit:$junitVersion",

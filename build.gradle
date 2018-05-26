@@ -1,5 +1,9 @@
 buildscript {
     apply from: file('versions.gradle')
+
+    dependencies {
+        classpath libraries.gradleRelease
+    }
 }
 
 plugins {
@@ -10,6 +14,7 @@ plugins {
 apply plugin: "idea"
 apply plugin: "groovy"
 apply plugin: "maven-publish"
+apply plugin: 'net.researchgate.release'
 
 group = "com.github.sinwe.gradle.caching.hazelcast"
 version = "0.12-SNAPSHOT"

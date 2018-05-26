@@ -96,3 +96,8 @@ artifactory {
         repoKey = "repo"
     }
 }
+
+artifacts {
+    archives jar
+    archives sourcesJar
+}

@@ -13,6 +13,7 @@ plugins {
 
 apply plugin: "idea"
 apply plugin: "groovy"
+apply plugin: 'signing'
 apply plugin: "maven-publish"
 apply plugin: 'net.researchgate.release'
 
@@ -95,6 +96,54 @@ artifactory {
     resolve {
         repoKey = "repo"
     }
+}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'Gradle Hazelcast Plugin'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend'
+                url 'https://github.com/sinwe/gradle-hazelcast-plugin'
+
+                scm {
+                    connection 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
+                    developerConnection 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
+                    url 'https://github.com/sinwe/gradle-hazelcast-plugin'
+                }
+
+                licenses {
+                    license {
+                        name 'Apache License, Version 2.0, January 2004'
+                        url 'https://www.apache.org/licenses/LICENSE-2.0.html'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'sinwe'
+                        name 'Winarto'
+                        email 'winarto@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+signing {
+    required { isReleaseVersion }
+    sign configurations.archives
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

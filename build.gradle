@@ -17,7 +17,6 @@ apply plugin: "maven-publish"
 apply plugin: 'net.researchgate.release'
 
 group = "com.github.sinwe.gradle.caching.hazelcast"
-version = "0.12-SNAPSHOT"
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
@@ -25,8 +24,8 @@ targetCompatibility = "1.8"
 gradlePlugin {
     plugins {
         hazelcastPlugin {
-            id = "com.github.sinwe.hazelcast"
-            implementationClass = "com.github.sinwe.hazelcast.HazelcastPlugin"
+            id = "com.github.sinwe.gradle.caching.hazelcast"
+            implementationClass = "com.github.sinwe.gradle.caching.hazelcast.HazelcastPlugin"
         }
     }
 }

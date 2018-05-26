@@ -158,9 +158,14 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
+task javadocJar(type: Jar, dependsOn: 'javadoc') {
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
 artifacts {
     archives jar
     archives sourcesJar
+    archives javadocJar
 }
 
 afterReleaseBuild.dependsOn uploadArchives

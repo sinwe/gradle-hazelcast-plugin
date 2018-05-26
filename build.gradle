@@ -15,6 +15,7 @@ apply plugin: "idea"
 apply plugin: "groovy"
 apply plugin: 'signing'
 apply plugin: "maven-publish"
+apply plugin: "maven"
 apply plugin: 'net.researchgate.release'
 
 group = "com.github.sinwe.gradle.caching.hazelcast"
@@ -97,6 +98,11 @@ artifactory {
         repoKey = "repo"
     }
 }
+
+ext.sonatypeUsername = hasProperty("ossrhUsername") ? ossrhUsername : System.getenv("ossrhUsername")
+
+ext.sonatypePassword = hasProperty("ossrhPassword") ? ossrhPassword : System.getenv("ossrhPassword")
+
 uploadArchives {
     repositories {
         mavenDeployer {

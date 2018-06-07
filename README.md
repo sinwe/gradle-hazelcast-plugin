@@ -1,6 +1,8 @@
 # Gradle Hazelcast cache backend plugin
 
 [![Build Status](https://travis-ci.org/sinwe/gradle-hazelcast-plugin.svg?branch=master)](https://travis-ci.org/sinwe/gradle-hazelcast-plugin)
+[![Gradle Hazelcast Plugin](https://maven-badges.herokuapp.com/maven-central/com.github.sinwe.gradle.caching.hazelcast/gradle-hazelcast-plugin/badge.svg?style=plastic)](http://mvnrepository.com/artifact/com.github.sinwe.gradle.caching.hazelcast/gradle-hazelcast-plugin)
+
 
 A simple [settings plugin](https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html) that enables [build caching](https://guides.gradle.org/using-build-cache/) in Gradle with a [Hazelcast](http://hazelcast.org) node as the backend. The Hazelcast node itself needs to be set up separately.
 

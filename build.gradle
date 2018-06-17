@@ -3,12 +3,14 @@ buildscript {
 
     dependencies {
         classpath libraries.gradleRelease
+        classpath libraries.owasp
+        classpath libraries.version
     }
 }
 
 plugins {
     id "java-gradle-plugin"
-    id "com.jfrog.artifactory" version "4.4.9"
+    id "com.jfrog.artifactory" version "4.7.3"
 }
 
 apply plugin: "idea"
@@ -17,6 +19,8 @@ apply plugin: 'signing'
 apply plugin: "maven-publish"
 apply plugin: "maven"
 apply plugin: 'net.researchgate.release'
+apply plugin: 'org.owasp.dependencycheck'
+apply plugin: 'com.github.ben-manes.versions'
 
 group = "com.github.sinwe.gradle.caching.hazelcast"
 description = "A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend"

@@ -7,6 +7,8 @@ A simple [settings plugin](https://docs.gradle.org/current/dsl/org.gradle.api.in
 
 For a production-ready build cache implementation (featuring node management, usage statistics, health monitoring, replication, access control and more), see [Gradle Enteprise](https://gradle.com/build-cache).
 
+For an alternative http-based build cache implementation, see [HTTP Build Cache Server](https://github.com/sinwe/http-gradle-cache-server)
+
 ## How to use
 
 Add this to your `settings.gradle`:

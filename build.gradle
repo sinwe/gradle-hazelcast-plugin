@@ -52,6 +52,9 @@ publishing {
     publications {
         jar(MavenPublication) {
             from components.java
+
+//            artifactId = "gradle-hazelcast-plugin"
+
             pom {
                 name = 'Gradle Hazelcast Plugin'
                 description = 'A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend'
@@ -139,62 +142,23 @@ artifactory {
     }
 }
 
-/*
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-
-            pom.project {
-                name 'Gradle Hazelcast Plugin'
-                packaging 'jar'
-                // optionally artifactId can be defined here
-                description 'A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend'
-                url 'https://github.com/sinwe/gradle-hazelcast-plugin'
-
-                scm {
-                    connection 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
-                    developerConnection 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
-                    url 'https://github.com/sinwe/gradle-hazelcast-plugin'
-                }
-
-                licenses {
-                    license {
-                        name 'Apache License, Version 2.0, January 2004'
-                        url 'https://www.apache.org/licenses/LICENSE-2.0.html'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'sinwe'
-                        name 'Winarto'
-                        email 'winarto@gmail.com'
-                    }
-                }
-            }
-        }
-    }
-}
-*/
-
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 signing {
     required { isReleaseVersion }
-//    sign configurations.archives
     sign publishing.publications.jar
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
+
+/*
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier "sources"
+}
+*/
 
 javadoc {
     if(JavaVersion.current().isJava9Compatible()) {
@@ -202,14 +166,18 @@ javadoc {
     }
 }
 
+/*
 task javadocJar(type: Jar, dependsOn: 'javadoc') {
     from javadoc.destinationDir
     classifier = 'javadoc'
 }
+*/
+/*
 artifacts {
     archives jar
     archives sourcesJar
     archives javadocJar
 }
+*/
 
 afterReleaseBuild.dependsOn publish

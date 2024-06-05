@@ -50,10 +50,10 @@ publishing {
         }
     }
     publications {
-        jar(MavenPublication) {
-            from components.java
+        pluginMaven(MavenPublication) {
+//            from components.java
 
-//            artifactId = "gradle-hazelcast-plugin"
+            artifactId = "gradle-hazelcast-plugin"
 
             pom {
                 name = 'Gradle Hazelcast Plugin'
@@ -145,7 +145,7 @@ artifactory {
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 signing {
     required { isReleaseVersion }
-    sign publishing.publications.jar
+    sign publishing.publications.pluginMaven
 }
 
 java {

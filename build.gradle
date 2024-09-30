@@ -10,7 +10,7 @@ buildscript {
 
 plugins {
     id "java-gradle-plugin"
-    id "com.jfrog.artifactory" version "4.18.3"
+    id "com.jfrog.artifactory" version "4.24.20"
 }
 
 apply plugin: "idea"

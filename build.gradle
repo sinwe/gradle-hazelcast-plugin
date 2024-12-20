@@ -219,7 +219,7 @@ artifacts {
 }
 */
 
-//afterReleaseBuild.dependsOn uploadArchives
+afterReleaseBuild.dependsOn publish
 
 release {
     scmAdapters = [net.researchgate.release.GitAdapter]

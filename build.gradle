@@ -12,12 +12,12 @@ plugins {
     id "java-gradle-plugin"
     id "com.jfrog.artifactory" version "4.24.20"
     id 'signing'
+    id 'maven-publish'
 }
 
 apply plugin: "idea"
 apply plugin: "groovy"
 apply plugin: "maven-publish"
-apply plugin: "maven"
 apply plugin: 'net.researchgate.release'
 apply plugin: 'org.owasp.dependencycheck'
 apply plugin: 'com.github.ben-manes.versions'
@@ -64,11 +64,11 @@ task createClasspathManifest {
 }
 
 dependencies {
-    compile libraries.hazelcastClient
-    testCompile libraries.junit
-    testCompile "org.spockframework:spock-core:1.0-groovy-2.4@jar"
-    testCompile libraries.hazelcast
-    testRuntime files(createClasspathManifest)
+    implementation libraries.hazelcastClient
+    testImplementation libraries.junit
+    testImplementation "org.spockframework:spock-core:1.0-groovy-2.4@jar"
+    testImplementation libraries.hazelcast
+    testRuntimeOnly files(createClasspathManifest)
 }
 
 // --- Configure publications ------------------------------------------
@@ -108,7 +108,7 @@ ext.sonatypeUsername = hasProperty("ossrhUsername") ? ossrhUsername : System.get
 
 ext.sonatypePassword = hasProperty("ossrhPassword") ? ossrhPassword : System.getenv("ossrhPassword")
 
-uploadArchives {
+/*uploadArchives {
     repositories {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
@@ -149,7 +149,7 @@ uploadArchives {
             }
         }
     }
-}
+}*/
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 signing {

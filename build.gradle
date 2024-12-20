@@ -11,11 +11,11 @@ buildscript {
 plugins {
     id "java-gradle-plugin"
     id "com.jfrog.artifactory" version "4.24.20"
+    id 'signing'
 }
 
 apply plugin: "idea"
 apply plugin: "groovy"
-apply plugin: 'signing'
 apply plugin: "maven-publish"
 apply plugin: "maven"
 apply plugin: 'net.researchgate.release'

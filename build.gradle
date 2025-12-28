@@ -162,4 +162,10 @@ signing {
     sign publishing.publications.maven
 }
 
+release {
+    git {
+        requireBranch.set('master')
+    }
+}
+
 afterReleaseBuild.dependsOn publish

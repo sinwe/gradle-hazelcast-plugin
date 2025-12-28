@@ -10,14 +10,13 @@ buildscript {
 
 plugins {
     id "java-gradle-plugin"
-    id "com.jfrog.artifactory" version "4.24.20"
+    id "com.jfrog.artifactory" version "5.2.5"
 }
 
 apply plugin: "idea"
 apply plugin: "groovy"
 apply plugin: 'signing'
 apply plugin: "maven-publish"
-apply plugin: "maven"
 apply plugin: 'net.researchgate.release'
 apply plugin: 'org.owasp.dependencycheck'
 apply plugin: 'com.github.ben-manes.versions'
@@ -27,6 +26,10 @@ description = "A simple settings plugin that enables build caching in Gradle wit
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
+
+test {
+    useJUnitPlatform()
+}
 
 gradlePlugin {
     plugins {
@@ -39,10 +42,62 @@ gradlePlugin {
 
 def localRepo = file("$buildDir/repo")
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: 'javadoc') {
+    archiveClassifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
 publishing {
     publications {
-        jar(MavenPublication) {
+        maven(MavenPublication) {
             from components.java
+            artifact tasks.sourcesJar
+            artifact tasks.javadocJar
+
+            pom {
+                name = 'Gradle Hazelcast Plugin'
+                packaging = 'jar'
+                description = 'A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend'
+                url = 'https://github.com/sinwe/gradle-hazelcast-plugin'
+
+                scm {
+                    connection = 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
+                    developerConnection = 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
+                    url = 'https://github.com/sinwe/gradle-hazelcast-plugin'
+                }
+
+                licenses {
+                    license {
+                        name = 'Apache License, Version 2.0, January 2004'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.html'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'sinwe'
+                        name = 'Winarto'
+                        email = 'winarto@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "mavenCentral"
+            url = version.endsWith('SNAPSHOT') ?
+                "https://oss.sonatype.org/content/repositories/snapshots" :
+                "https://central.sonatype.com/api/v1/publisher"
+            credentials {
+                username = findProperty("mavenCentralUsername") ?: System.getenv("MAVEN_CENTRAL_USERNAME")
+                password = findProperty("mavenCentralPassword") ?: System.getenv("MAVEN_CENTRAL_PASSWORD")
+            }
         }
     }
 }
@@ -64,11 +119,12 @@ task createClasspathManifest {
 }
 
 dependencies {
-    compile libraries.hazelcastClient
-    testCompile libraries.junit
-    testCompile "org.spockframework:spock-core:1.0-groovy-2.4@jar"
-    testCompile libraries.hazelcast
-    testRuntime files(createClasspathManifest)
+    implementation libraries.hazelcastClient
+    testImplementation libraries.junit
+    testImplementation libraries.spockCore
+    testImplementation libraries.spockJunit4
+    testImplementation libraries.hazelcast
+    testRuntimeOnly files(createClasspathManifest)
 }
 
 // --- Configure publications ------------------------------------------
@@ -93,60 +149,9 @@ artifactory {
             repoKey = targetRepoKey
             username = project.findProperty("artifactory_user") ?: "nouser"
             password = project.findProperty("artifactory_password") ?: "nopass"
-            maven = true
         }
         defaults {
-            publications("jar")
-        }
-    }
-    resolve {
-        repoKey = "repo"
-    }
-}
-
-ext.sonatypeUsername = hasProperty("ossrhUsername") ? ossrhUsername : System.getenv("ossrhUsername")
-
-ext.sonatypePassword = hasProperty("ossrhPassword") ? ossrhPassword : System.getenv("ossrhPassword")
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-
-            pom.project {
-                name 'Gradle Hazelcast Plugin'
-                packaging 'jar'
-                // optionally artifactId can be defined here
-                description 'A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend'
-                url 'https://github.com/sinwe/gradle-hazelcast-plugin'
-
-                scm {
-                    connection 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
-                    developerConnection 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
-                    url 'https://github.com/sinwe/gradle-hazelcast-plugin'
-                }
-
-                licenses {
-                    license {
-                        name 'Apache License, Version 2.0, January 2004'
-                        url 'https://www.apache.org/licenses/LICENSE-2.0.html'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'sinwe'
-                        name 'Winarto'
-                        email 'winarto@gmail.com'
-                    }
-                }
-            }
+            publications("maven")
         }
     }
 }
@@ -154,22 +159,7 @@ uploadArchives {
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 signing {
     required { isReleaseVersion }
-    sign configurations.archives
+    sign publishing.publications.maven
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: 'javadoc') {
-    from javadoc.destinationDir
-    classifier = 'javadoc'
-}
-artifacts {
-    archives jar
-    archives sourcesJar
-    archives javadocJar
-}
-
-afterReleaseBuild.dependsOn uploadArchives
+afterReleaseBuild.dependsOn publish

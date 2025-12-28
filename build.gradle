@@ -95,8 +95,8 @@ publishing {
                 "https://s01.oss.sonatype.org/content/repositories/snapshots/" :
                 "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             credentials {
-                username = findProperty("mavenCentralUsername") ?: System.getenv("MAVEN_CENTRAL_USERNAME")
-                password = findProperty("mavenCentralPassword") ?: System.getenv("MAVEN_CENTRAL_PASSWORD")
+                username = findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
+                password = findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
             }
         }
     }

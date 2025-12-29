@@ -98,32 +98,35 @@ publishing {
     }
 }
 
-// Configure plugin marker publications (created by java-gradle-plugin)
+// Configure all publications created by java-gradle-plugin
 afterEvaluate {
-    publishing.publications.matching { it.name.contains('PluginMarker') }.all {
-        pom {
-            name = 'Gradle Hazelcast Plugin'
-            description = 'A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend'
-            url = 'https://github.com/sinwe/gradle-hazelcast-plugin'
-
-            scm {
-                connection = 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
-                developerConnection = 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
+    publishing.publications.all {
+        // Skip the hazelcastPlugin publication as it already has metadata configured
+        if (it.name != 'hazelcastPlugin') {
+            pom {
+                name = 'Gradle Hazelcast Plugin'
+                description = 'A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend'
                 url = 'https://github.com/sinwe/gradle-hazelcast-plugin'
-            }
 
-            licenses {
-                license {
-                    name = 'Apache License, Version 2.0, January 2004'
-                    url = 'https://www.apache.org/licenses/LICENSE-2.0.html'
+                scm {
+                    connection = 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
+                    developerConnection = 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
+                    url = 'https://github.com/sinwe/gradle-hazelcast-plugin'
                 }
-            }
 
-            developers {
-                developer {
-                    id = 'sinwe'
-                    name = 'Winarto'
-                    email = 'winarto@gmail.com'
+                licenses {
+                    license {
+                        name = 'Apache License, Version 2.0, January 2004'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.html'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'sinwe'
+                        name = 'Winarto'
+                        email = 'winarto@gmail.com'
+                    }
                 }
             }
         }

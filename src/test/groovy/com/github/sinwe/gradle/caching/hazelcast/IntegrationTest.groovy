@@ -2,9 +2,8 @@ package com.github.sinwe.gradle.caching.hazelcast
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
 
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
@@ -28,18 +27,21 @@ class IntegrationTest extends Specification {
         """
     public static final String CLASSPATH = IntegrationTest.class.classLoader.getResource("plugin-classpath.txt").text.split("\n").collect { path -> "'$path'" }.join(", ")
 
-    @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
+    @TempDir File testProjectDir
     final arguments = []
     File buildFile
     List<String> cachedTasks
     List<String> executedTasks
-
-    @Rule HazelcastService hazelcastService = new HazelcastService(HAZELCAST_PORT)
+    HazelcastService hazelcastService
 
     def setup() {
-        buildFile = testProjectDir.newFile("build.gradle")
+        hazelcastService = new HazelcastService(HAZELCAST_PORT)
+        hazelcastService.start()
 
-        testProjectDir.newFile("settings.gradle") << """
+        buildFile = new File(testProjectDir, "build.gradle")
+        buildFile.createNewFile()
+
+        new File(testProjectDir, "settings.gradle").text = """
             rootProject.name = 'test'
 
             buildscript {
@@ -61,12 +63,16 @@ class IntegrationTest extends Specification {
             apply plugin: "java"
         """
 
-        testProjectDir.newFolder "src", "main", "java"
-        testProjectDir.newFile("src/main/java/Hello.java") << ORIGINAL_HELLO_WORLD
-        testProjectDir.newFolder "src", "main", "resources"
-        testProjectDir.newFile("src/main/resources/resource.properties") << """
+        new File(testProjectDir, "src/main/java").mkdirs()
+        new File(testProjectDir, "src/main/java/Hello.java").text = ORIGINAL_HELLO_WORLD
+        new File(testProjectDir, "src/main/resources").mkdirs()
+        new File(testProjectDir, "src/main/resources/resource.properties").text = """
             test=true
         """
+    }
+
+    def cleanup() {
+        hazelcastService?.stop()
     }
 
     def "no task is re-executed when inputs are unchanged"() {
@@ -143,7 +149,7 @@ class IntegrationTest extends Specification {
     }
 
     def "non-cacheable task with cache enabled gets cached"() {
-        testProjectDir.newFile("input.txt") << "data"
+        new File(testProjectDir, "input.txt").text = "data"
         buildFile << """
             class NonCacheableTask extends DefaultTask {
                 @InputFile inputFile
@@ -180,7 +186,7 @@ class IntegrationTest extends Specification {
         arguments.addAll tasks
         def result = GradleRunner.create()
             .forwardOutput()
-            .withProjectDir(testProjectDir.root)
+            .withProjectDir(testProjectDir)
             .withArguments(arguments)
             .build()
         assert result.taskPaths(FAILED).empty
@@ -190,6 +196,6 @@ class IntegrationTest extends Specification {
     }
 
     File file(String path) {
-        return new File(testProjectDir.root, path)
+        return new File(testProjectDir, path)
     }
 }

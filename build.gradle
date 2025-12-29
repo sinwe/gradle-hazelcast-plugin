@@ -167,9 +167,7 @@ task createClasspathManifest {
 
 dependencies {
     implementation libraries.hazelcast
-    testImplementation libraries.junit
     testImplementation libraries.spockCore
-    testImplementation libraries.spockJunit4
     testRuntimeOnly libraries.junitPlatform
     testRuntimeOnly files(createClasspathManifest)
 }

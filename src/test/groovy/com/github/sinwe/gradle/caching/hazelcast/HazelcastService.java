@@ -2,11 +2,10 @@ package com.github.sinwe.gradle.caching.hazelcast;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.core.*;
-import org.junit.rules.ExternalResource;
 
 import java.util.logging.Level;
 
-public class HazelcastService extends ExternalResource {
+public class HazelcastService {
 
     private final int port;
     private HazelcastInstance instance;
@@ -19,8 +18,7 @@ public class HazelcastService extends ExternalResource {
         this.port = port;
     }
 
-    @Override
-    protected void before() throws Throwable {
+    public void start() {
         java.util.logging.Logger.getLogger("com.hazelcast").setLevel(Level.WARNING);
         Config config = new Config();
         config
@@ -36,8 +34,9 @@ public class HazelcastService extends ExternalResource {
         return port;
     }
 
-    @Override
-    protected void after() {
-        instance.shutdown();
+    public void stop() {
+        if (instance != null) {
+            instance.shutdown();
+        }
     }
 }

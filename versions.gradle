@@ -4,6 +4,7 @@ ext {
     gradlePluginVersionVersion  = "0.53.0"
     hazelcastVersion            = "3.10.2"
     junitVersion                = "4.12"
+    junitPlatformVersion        = "1.11.4"
     spockVersion                = "2.3"
 }
 
@@ -12,8 +13,9 @@ ext.libraries = [
     hazelcast           : "com.hazelcast:hazelcast:$hazelcastVersion",
     hazelcastClient     : "com.hazelcast:hazelcast-client:$hazelcastVersion",
     junit               : "junit:junit:$junitVersion",
+    junitPlatform       : "org.junit.platform:junit-platform-launcher:$junitPlatformVersion",
     owasp               : "org.owasp:dependency-check-gradle:$gradlePluginOwaspVersion",
-    spockCore           : "org.spockframework:spock-core:$spockVersion-groovy-3.0",
-    spockJunit4         : "org.spockframework:spock-junit4:$spockVersion-groovy-3.0",
+    spockCore           : "org.spockframework:spock-core:$spockVersion-groovy-4.0",
+    spockJunit4         : "org.spockframework:spock-junit4:$spockVersion-groovy-4.0",
     version             : "com.github.ben-manes:gradle-versions-plugin:$gradlePluginVersionVersion"
 ]

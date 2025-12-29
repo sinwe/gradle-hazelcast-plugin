@@ -10,7 +10,6 @@ buildscript {
 
 plugins {
     id "java-gradle-plugin"
-    id "com.jfrog.artifactory" version "4.24.20"
     id 'signing'
     id 'maven-publish'
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
@@ -25,8 +24,10 @@ apply plugin: 'com.github.ben-manes.versions'
 group = "com.github.sinwe.gradle.caching.hazelcast"
 description = "A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend"
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 test {
     useJUnitPlatform()
@@ -170,6 +171,7 @@ dependencies {
     testImplementation libraries.spockCore
     testImplementation libraries.spockJunit4
     testImplementation libraries.hazelcast
+    testRuntimeOnly libraries.junitPlatform
     testRuntimeOnly files(createClasspathManifest)
 }
 
@@ -253,7 +255,7 @@ artifactory {
 }*/
 
 signing {
-    required { isReleaseVersion }
+    required = { isReleaseVersion }
     sign publishing.publications
 }
 

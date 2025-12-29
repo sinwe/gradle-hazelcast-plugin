@@ -102,12 +102,14 @@ Key dependencies:
 ## Gradle Configuration
 
 The project uses:
-- Gradle 6.9.4 (via Gradle wrapper)
-- Java 8 source/target compatibility (requires JDK 11+ for building due to gradle-nexus/publish-plugin 2.0.0)
+- Gradle 9.2.1 (via Gradle wrapper)
+- Java 17 source/target compatibility (Gradle 9 requires JDK 17+ to run)
 - `java-gradle-plugin` for automatic plugin metadata generation
 - Plugin ID: `com.github.sinwe.gradle.caching.hazelcast`
 - Group: `com.github.sinwe.gradle.caching.hazelcast`
 - Artifact: `gradle-hazelcast-plugin`
+
+**Note**: Gradle 9 dropped support for Java 8-16. Since users must have JDK 17+ to run Gradle 9, the plugin now targets Java 17 bytecode to leverage modern language features.
 
 ## Publishing Configuration
 

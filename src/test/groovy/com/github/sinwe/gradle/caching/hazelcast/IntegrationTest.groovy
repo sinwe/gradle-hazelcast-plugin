@@ -87,7 +87,9 @@ class IntegrationTest extends Specification {
     def "outputs are correctly loaded from cache"() {
         buildFile << """
             apply plugin: "application"
-            mainClassName = "Hello"
+            application {
+                mainClass = "Hello"
+            }
         """
         succeeds "run"
         succeeds "clean"

@@ -11,6 +11,19 @@ For a production-ready build cache implementation (featuring node management, us
 
 For an alternative http-based build cache implementation, see [HTTP Build Cache Server](https://github.com/sinwe/http-gradle-cache-server)
 
+## Version Compatibility Matrix
+
+Plugin Version | Gradle Version | Minimum JDK (Runtime) | Build JDK | Notes
+-------------- | -------------- | --------------------- | --------- | -----
+0.15           | 7.6+           | 8                     | 11+       | Sonatype Central Portal support with gradle-nexus plugin 2.0.0
+0.14           | 6.0+           | 8                     | 8+        | Legacy OSSRH publishing
+0.13 and below | 5.0+           | 8                     | 8+        | Legacy versions
+
+**Notes:**
+- **Runtime JDK**: Minimum JDK version required to use this plugin in your project
+- **Build JDK**: JDK version required to build/release the plugin itself (relevant for contributors)
+- All versions maintain Java 8 bytecode compatibility for the compiled plugin
+
 ## How to use
 
 Add this to your `settings.gradle`:
@@ -22,7 +35,7 @@ buildscript {
   }
 
   dependencies {
-    classpath "com.github.sinwe.gradle.caching.hazelcast:gradle-hazelcast-plugin:0.13"
+    classpath "com.github.sinwe.gradle.caching.hazelcast:gradle-hazelcast-plugin:0.15"
   }
 }
 

@@ -13,19 +13,19 @@ For an alternative http-based build cache implementation, see [HTTP Build Cache 
 
 ## Version Compatibility Matrix
 
-Plugin Version | Gradle Version | Hazelcast Version | Minimum JDK (Runtime) | Build JDK | Notes
--------------- | -------------- | ----------------- | --------------------- | --------- | -----
-0.17+          | 9.2+           | 5.6.0             | 17                    | 17+       | **Gradle 9 requires Java 17+**, Hazelcast 5.6+ officially supports Java 17, Spock 2.3-groovy-4.0, Java 17 bytecode
-0.16           | 8.14+          | 3.10.2            | 8                     | 11+       | Gradle 8.14, Spock 2.3-groovy-3.0, Java 24 support, Java 8 bytecode, Hazelcast 3.10 not officially supported on Java 17
-0.15           | 7.6+           | 3.10.2            | 8                     | 11+       | Sonatype Central Portal support with gradle-nexus plugin 2.0.0
-0.14           | 6.0+           | 3.10.2            | 8                     | 8+        | Legacy OSSRH publishing
-0.13 and below | 5.0+           | 3.10.2            | 8                     | 8+        | Legacy versions
+Plugin Version | Gradle Version | Hazelcast Version | Minimum JDK | Tested JDK LTS Versions | Build JDK | Notes
+-------------- | -------------- | ----------------- | ----------- | ----------------------- | --------- | -----
+0.17+          | 9.2+           | 5.6.0             | 17          | 17, 21, 25              | 17+       | **Gradle 9 requires Java 17+**, Hazelcast 5.6+ officially supports Java 17, tested on all LTS versions via CI
+0.16           | 8.14+          | 3.10.2            | 8           | 8, 11, 17               | 11+       | Gradle 8.14, Java 8 bytecode, Hazelcast 3.10 not officially supported on Java 17
+0.15           | 7.6+           | 3.10.2            | 8           | 8, 11                   | 11+       | Sonatype Central Portal support with gradle-nexus plugin 2.0.0
+0.14           | 6.0+           | 3.10.2            | 8           | 8, 11                   | 8+        | Legacy OSSRH publishing
+0.13 and below | 5.0+           | 3.10.2            | 8           | 8, 11                   | 8+        | Legacy versions
 
 **Notes:**
-- **Runtime JDK**: Minimum JDK version required to run Gradle itself (and by extension, use this plugin)
+- **Minimum JDK**: The minimum JDK version required to run Gradle (and by extension, use this plugin)
+- **Tested JDK LTS Versions**: The LTS JDK versions that the plugin is known to work with. Version 0.17+ is tested in CI on all listed versions in parallel on every commit
 - **Build JDK**: JDK version required to build/release the plugin itself (relevant for contributors)
 - **Hazelcast Version**: Version of Hazelcast library used by the plugin. Note that you'll need to run a compatible Hazelcast server separately
-- **CI Testing**: The plugin is tested on all LTS JDK versions from 17+ (JDK 17, 21, and 25) in parallel on every commit to ensure broad compatibility
 - **Important for v0.17+**: Gradle 9 dropped support for Java 8-16. You must have JDK 17+ installed to run Gradle 9, even though the plugin could theoretically compile to Java 8 bytecode. Since users must have Java 17+ anyway, the plugin now targets Java 17 bytecode to take advantage of modern Java features. Additionally, Hazelcast was upgraded from 3.10.2 to 5.6.0 for official Java 17 support.
 
 ## How to use

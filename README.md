@@ -25,6 +25,7 @@ Plugin Version | Gradle Version | Hazelcast Version | Minimum JDK (Runtime) | Bu
 - **Runtime JDK**: Minimum JDK version required to run Gradle itself (and by extension, use this plugin)
 - **Build JDK**: JDK version required to build/release the plugin itself (relevant for contributors)
 - **Hazelcast Version**: Version of Hazelcast library used by the plugin. Note that you'll need to run a compatible Hazelcast server separately
+- **CI Testing**: The plugin is tested on all LTS JDK versions from 17+ (JDK 17, 21, and 25) in parallel on every commit to ensure broad compatibility
 - **Important for v0.17+**: Gradle 9 dropped support for Java 8-16. You must have JDK 17+ installed to run Gradle 9, even though the plugin could theoretically compile to Java 8 bytecode. Since users must have Java 17+ anyway, the plugin now targets Java 17 bytecode to take advantage of modern Java features. Additionally, Hazelcast was upgraded from 3.10.2 to 5.6.0 for official Java 17 support.
 
 ## How to use

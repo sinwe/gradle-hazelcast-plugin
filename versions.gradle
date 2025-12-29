@@ -2,7 +2,7 @@ ext {
     gradlePluginOwaspVersion    = "8.4.3"
     gradlePluginReleaseVersion  = "3.1.0"
     gradlePluginVersionVersion  = "0.53.0"
-    hazelcastVersion            = "3.10.2"
+    hazelcastVersion            = "5.6.0"
     junitVersion                = "4.12"
     junitPlatformVersion        = "1.11.4"
     spockVersion                = "2.3"
@@ -11,7 +11,6 @@ ext {
 ext.libraries = [
     gradleRelease       : "net.researchgate:gradle-release:$gradlePluginReleaseVersion",
     hazelcast           : "com.hazelcast:hazelcast:$hazelcastVersion",
-    hazelcastClient     : "com.hazelcast:hazelcast-client:$hazelcastVersion",
     junit               : "junit:junit:$junitVersion",
     junitPlatform       : "org.junit.platform:junit-platform-launcher:$junitPlatformVersion",
     owasp               : "org.owasp:dependency-check-gradle:$gradlePluginOwaspVersion",

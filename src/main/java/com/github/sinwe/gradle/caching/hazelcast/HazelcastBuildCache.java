@@ -1,6 +1,5 @@
 package com.github.sinwe.gradle.caching.hazelcast;
 
-import com.hazelcast.util.Preconditions;
 import org.gradle.caching.configuration.AbstractBuildCache;
 
 /**
@@ -48,7 +47,9 @@ public class HazelcastBuildCache extends AbstractBuildCache {
     }
 
     public void setName(String name) {
-        Preconditions.checkHasText(name, "cache name must not be empty");
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("cache name must not be empty");
+        }
         this.name = name;
     }
 
@@ -57,7 +58,9 @@ public class HazelcastBuildCache extends AbstractBuildCache {
     }
 
     public void setHost(String host) {
-        Preconditions.checkHasText(host, "host name must not be empty");
+        if (host == null || host.trim().isEmpty()) {
+            throw new IllegalArgumentException("host name must not be empty");
+        }
         this.host = host;
     }
 
@@ -66,7 +69,9 @@ public class HazelcastBuildCache extends AbstractBuildCache {
     }
 
     public void setPort(int port) {
-        Preconditions.checkPositive(port, "port must be a positive number");
+        if (port <= 0) {
+            throw new IllegalArgumentException("port must be a positive number");
+        }
         this.port = port;
     }
 }

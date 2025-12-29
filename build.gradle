@@ -166,11 +166,10 @@ task createClasspathManifest {
 }
 
 dependencies {
-    implementation libraries.hazelcastClient
+    implementation libraries.hazelcast
     testImplementation libraries.junit
     testImplementation libraries.spockCore
     testImplementation libraries.spockJunit4
-    testImplementation libraries.hazelcast
     testRuntimeOnly libraries.junitPlatform
     testRuntimeOnly files(createClasspathManifest)
 }

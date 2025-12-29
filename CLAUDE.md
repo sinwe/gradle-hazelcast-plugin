@@ -4,13 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Gradle settings plugin that enables build caching with a Hazelcast node as the backend. The plugin implements Gradle's BuildCacheService interface using Hazelcast's distributed map as storage.
-
-**Key characteristics:**
-- Settings plugin (not a project plugin) - applied in `settings.gradle`, not `build.gradle`
-- Disables local cache by default since Hazelcast serves as both local and remote cache
-- Supports multiple Hazelcast hosts via comma-separated host list
-- Uses Hazelcast client (not embedded node) to connect to external Hazelcast cluster
+This is a Gradle settings plugin that enables build caching using Hazelcast as the cache backend. The plugin allows Gradle builds to store and retrieve task outputs from a distributed Hazelcast cluster, speeding up builds across multiple machines or build agents.
 
 ## Build Commands
 
@@ -18,96 +12,135 @@ This is a Gradle settings plugin that enables build caching with a Hazelcast nod
 # Build the plugin
 ./gradlew build
 
-# Run tests (includes integration tests with embedded Hazelcast)
+# Run tests
 ./gradlew test
 
-# Run single test class
-./gradlew test --tests "IntegrationTest"
+# Clean build artifacts
+./gradlew clean
 
-# Run single test method
-./gradlew test --tests "IntegrationTest.no task is re-executed when inputs are unchanged"
-
-# Check for dependency vulnerabilities
+# Check for dependency vulnerabilities (OWASP)
 ./gradlew dependencyCheckAnalyze
 
 # Check for dependency updates
-./gradlew dependenceUpdates
+./gradlew dependenceiesUpdates
+```
 
-# Publish to local Maven repo
+## Publishing Commands
+
+```bash
+# Publish to local Maven repository for testing
 ./gradlew publishToMavenLocal
 
-# Release (tags, publishes to Sonatype)
-./gradlew release
+# Release workflow (requires credentials and JDK 11+)
+./gradlew release  # This creates a git tag, publishes, and closes the staging repository
+
+# Publish manually to Central Portal (for testing)
+./gradlew publishToSonatype
+
+# Close staging repository (after publishToSonatype)
+./gradlew closeSonatypeStagingRepository
+
+# Release to Maven Central (manually after closing - requires separate invocation)
+./gradlew findSonatypeStagingRepository releaseSonatypeStagingRepository
+
+# All-in-one manual publish and close
+./gradlew publishToSonatype closeSonatypeStagingRepository
 ```
+
+The release process is automated using the `net.researchgate.release` plugin. After release, the `afterReleaseBuild` task automatically publishes and closes the staging repository using gradle-nexus/publish-plugin 2.0.0. You must then manually release via the Portal UI at [central.sonatype.com/publishing/deployments](https://central.sonatype.com/publishing/deployments) or run `releaseSonatypeStagingRepository` separately.
 
 ## Architecture
 
 ### Core Components
 
-1. **HazelcastPlugin** (`src/main/java/.../HazelcastPlugin.java`)
-   - Entry point: implements `Plugin<Settings>`
-   - Registers `HazelcastBuildCacheServiceFactory` with Gradle's build cache configuration
-   - Disables local cache and configures Hazelcast as remote cache
-   - Factory creates `MapBasedBuildCacheService` backed by Hazelcast IMap
+**HazelcastPlugin** (`src/main/java/com/github/sinwe/gradle/caching/hazelcast/HazelcastPlugin.java`)
+- Entry point - implements Gradle's `Plugin<Settings>` interface
+- Registers `HazelcastBuildCache` as a build cache service via `HazelcastBuildCacheServiceFactory`
+- Automatically disables local cache and configures Hazelcast as the remote cache
+- The factory creates a Hazelcast client connection and wraps the Hazelcast IMap in Gradle's `MapBasedBuildCacheService`
 
-2. **HazelcastBuildCache** (`src/main/java/.../HazelcastBuildCache.java`)
-   - Configuration object for the cache backend
-   - Properties: `host` (supports comma-separated list), `port`, `name`
-   - Reads system properties as defaults (can be overridden in settings.gradle):
-     - `com.github.sinwe.gradle.caching.hazelcast.host` (default: 127.0.0.1)
-     - `com.github.sinwe.gradle.caching.hazelcast.port` (default: 5701)
-     - `com.github.sinwe.gradle.caching.hazelcast.name` (default: gradle-task-cache)
+**HazelcastBuildCache** (`src/main/java/com/github/sinwe/gradle/caching/hazelcast/HazelcastBuildCache.java`)
+- Configuration class extending `AbstractBuildCache`
+- Defines three configurable properties: `host`, `port`, and `name`
+- Supports system property overrides: `com.github.sinwe.gradle.caching.hazelcast.{host,port,name}`
+- Default values: host=`127.0.0.1`, port=`5701`, name=`gradle-task-cache`
+- The `host` property supports comma-separated values for multiple Hazelcast nodes
 
-3. **HazelcastBuildCacheServiceFactory** (inner class in HazelcastPlugin)
-   - Creates Hazelcast client with configured addresses (host:port)
-   - Returns `MapBasedBuildCacheService` using Hazelcast's distributed map
-   - Gradle's `MapBasedBuildCacheService` handles serialization and key-value storage
+### Key Design Decisions
 
-### Test Structure
+1. **Settings Plugin**: This is a settings plugin (not a project plugin), so it's applied in `settings.gradle` rather than `build.gradle`. This is required because build cache configuration happens at settings evaluation time.
 
-- **IntegrationTest.groovy**: Spock integration tests using GradleRunner
-- **HazelcastService.java**: JUnit rule that starts/stops embedded Hazelcast for tests
-- Tests verify caching behavior: cache hits, cache misses, task outcomes
-- Uses custom port (5710) to avoid conflicts with running Hazelcast instances
+2. **MapBasedBuildCacheService**: The plugin leverages Gradle's built-in `MapBasedBuildCacheService` which wraps any `java.util.Map` implementation. The Hazelcast `IMap` is a distributed map that naturally fits this pattern.
 
-## Project Configuration
+3. **Client Connection**: Uses Hazelcast client mode (not embedded), connecting to an external Hazelcast cluster. The connection is established once per build when the factory creates the service.
 
-- **Java 8 compatibility** (sourceCompatibility/targetCompatibility = 1.8)
-- **Gradle 7.6.4** with Java 8+ runtime
-- **Dependencies managed in versions.gradle**
-- **Hazelcast 3.10.2** (client and full distribution for tests)
+4. **Multiple Hosts**: The factory parses the comma-separated host list and appends the port to each host address before configuring the Hazelcast client's network config.
 
-## Publishing
+## Testing
 
-The plugin publishes to:
-1. **Gradle Plugin Portal** (via `repo.gradle.org/gradle` with Artifactory)
-2. **Maven Central** (via Central Portal at `central.sonatype.com`)
+**IntegrationTest.groovy** (`src/test/groovy/com/github/sinwe/gradle/caching/hazelcast/IntegrationTest.groovy`)
+- Uses Gradle TestKit to run actual Gradle builds
+- Tests verify tasks are cached and retrieved correctly
+- The `HazelcastService` JUnit rule starts an embedded Hazelcast instance on port 5710 for testing
 
-Release process uses `net.researchgate.release` plugin:
-- Creates git tag
-- Uses `publish` task to upload to Maven Central Portal
-- Requires signing for non-SNAPSHOT versions
+**HazelcastService.java** (`src/test/groovy/com/github/sinwe/gradle/caching/hazelcast/HazelcastService.java`)
+- JUnit `ExternalResource` that manages a test Hazelcast instance lifecycle
+- Configures Hazelcast with multicast disabled (using the specified port only)
+- Automatically starts before each test and shuts down after
 
-### Credentials
+## Dependencies Management
 
-For publishing to Maven Central Portal, set these properties in `~/.gradle/gradle.properties`:
-```properties
-mavenCentralUsername=<your-token-username>
-mavenCentralPassword=<your-token-password>
-```
+Dependencies are centralized in `versions.gradle` using `ext.libraries` map. When updating dependencies:
+- Update version numbers in the `ext` block at the top of `versions.gradle`
+- Reference them via the `libraries` map in `build.gradle`
 
-For Artifactory (Gradle internal repo):
-```properties
-artifactory_user=<your-username>
-artifactory_password=<your-password>
-```
+Key dependencies:
+- `hazelcast-client`: Used by the plugin to connect to Hazelcast
+- `hazelcast`: Used only in tests for the embedded instance
+- Gradle plugin dependencies: release plugin, OWASP dependency check, version checker
 
-Note: OSSRH (oss.sonatype.org) was shut down on June 30, 2025. All publishing now goes through Central Portal.
+## Gradle Configuration
 
-## Important Implementation Details
+The project uses:
+- Gradle 6.9.4 (via Gradle wrapper)
+- Java 8 source/target compatibility (requires JDK 11+ for building due to gradle-nexus/publish-plugin 2.0.0)
+- `java-gradle-plugin` for automatic plugin metadata generation
+- Plugin ID: `com.github.sinwe.gradle.caching.hazelcast`
+- Group: `com.github.sinwe.gradle.caching.hazelcast`
+- Artifact: `gradle-hazelcast-plugin`
 
-- Plugin must be applied in `settings.gradle` (not `build.gradle`) because it configures build cache during settings evaluation
-- Hazelcast client connection is created once per build, map name identifies the cache
-- Multiple hosts support allows failover: "host1,host2,host3" all use same port
-- MapBasedBuildCacheService is Gradle's built-in implementation - we just provide the Map
-- Local cache disabled to avoid double-caching (Hazelcast already provides fast access)
+## Publishing Configuration
+
+The project uses the `io.github.gradle-nexus.publish-plugin` (version 2.0.0) for publishing to Sonatype Central Portal.
+
+Publications go to:
+- **Releases/Staging**: `https://ossrh-staging-api.central.sonatype.com/service/local/`
+- **Snapshots**: `https://central.sonatype.com/repository/maven-snapshots/`
+
+### Authentication Setup
+
+Credentials are sourced from (in order of precedence):
+1. Gradle properties in `~/.gradle/gradle.properties`:
+   - `sonatypeUsername` - User token username from central.sonatype.com/account
+   - `sonatypePassword` - User token password from central.sonatype.com/account
+2. Environment variables:
+   - `ORG_GRADLE_PROJECT_sonatypeUsername`
+   - `ORG_GRADLE_PROJECT_sonatypePassword`
+
+**Important**: Central Portal tokens are different from legacy OSSRH tokens. Generate new tokens at https://central.sonatype.com/account
+
+### Publication Artifacts
+
+Artifacts include:
+- Main JAR (from Java component)
+- Sources JAR
+- Javadoc JAR
+
+Signing is required only for release versions (non-SNAPSHOT).
+
+### Migration Notes
+
+This project has been migrated from the legacy OSSRH system to Sonatype Central Portal (as of 2025). The OSSRH service was sunset on June 30, 2025. Key changes:
+- New authentication tokens required from central.sonatype.com
+- Publishing workflow now uses staging repositories with explicit close/release steps
+- Publication timeline: ~15 minutes after release for artifacts to appear on Maven Central

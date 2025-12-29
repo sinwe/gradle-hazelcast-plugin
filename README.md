@@ -15,6 +15,7 @@ For an alternative http-based build cache implementation, see [HTTP Build Cache 
 
 Plugin Version | Gradle Version | Minimum JDK (Runtime) | Build JDK | Notes
 -------------- | -------------- | --------------------- | --------- | -----
+0.16+          | 8.14+          | 8                     | 11+       | Gradle 8.14, Spock 2.3, Java 24 support
 0.15           | 7.6+           | 8                     | 11+       | Sonatype Central Portal support with gradle-nexus plugin 2.0.0
 0.14           | 6.0+           | 8                     | 8+        | Legacy OSSRH publishing
 0.13 and below | 5.0+           | 8                     | 8+        | Legacy versions

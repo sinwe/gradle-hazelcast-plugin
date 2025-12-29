@@ -1,6 +1,6 @@
 # Gradle Hazelcast cache backend plugin
 
-[![Build Status](https://travis-ci.org/sinwe/gradle-hazelcast-plugin.svg?branch=master)](https://travis-ci.org/sinwe/gradle-hazelcast-plugin)
+[![Build](https://github.com/sinwe/gradle-hazelcast-plugin/actions/workflows/build.yml/badge.svg)](https://github.com/sinwe/gradle-hazelcast-plugin/actions/workflows/build.yml)
 [![Gradle Hazelcast Plugin](https://maven-badges.herokuapp.com/maven-central/com.github.sinwe.gradle.caching.hazelcast/gradle-hazelcast-plugin/badge.svg?style=plastic)](http://mvnrepository.com/artifact/com.github.sinwe.gradle.caching.hazelcast/gradle-hazelcast-plugin)
 [![Code Quality: Java](https://img.shields.io/lgtm/grade/java/g/sinwe/gradle-hazelcast-plugin.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/sinwe/gradle-hazelcast-plugin/context:java)
 [![Total Alerts](https://img.shields.io/lgtm/alerts/g/sinwe/gradle-hazelcast-plugin.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/sinwe/gradle-hazelcast-plugin/alerts)

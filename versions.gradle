@@ -1,9 +1,9 @@
 ext {
-    gradlePluginOwaspVersion    = "8.4.3"
+    gradlePluginOwaspVersion    = "12.1.9"
     gradlePluginReleaseVersion  = "3.1.0"
     gradlePluginVersionVersion  = "0.53.0"
     hazelcastVersion            = "5.6.0"
-    junitPlatformVersion        = "1.11.4"
+    junitPlatformVersion        = "6.0.1"
     spockVersion                = "2.3"
 }
 

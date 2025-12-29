@@ -167,7 +167,8 @@ task createClasspathManifest {
 dependencies {
     implementation libraries.hazelcastClient
     testImplementation libraries.junit
-    testImplementation "org.spockframework:spock-core:1.0-groovy-2.4@jar"
+    testImplementation libraries.spockCore
+    testImplementation libraries.spockJunit4
     testImplementation libraries.hazelcast
     testRuntimeOnly files(createClasspathManifest)
 }
@@ -254,6 +255,12 @@ artifactory {
 signing {
     required { isReleaseVersion }
     sign publishing.publications
+}
+
+// Fix task dependencies for Gradle 8+ strict validation
+tasks.withType(AbstractPublishToMaven).configureEach { publishTask ->
+    def signingTasks = tasks.withType(Sign)
+    dependsOn(signingTasks)
 }
 
 /*

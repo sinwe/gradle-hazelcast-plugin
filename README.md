@@ -3,7 +3,7 @@
 [![Build](https://github.com/sinwe/gradle-hazelcast-plugin/actions/workflows/build.yml/badge.svg)](https://github.com/sinwe/gradle-hazelcast-plugin/actions/workflows/build.yml)
 [![CodeQL](https://github.com/sinwe/gradle-hazelcast-plugin/actions/workflows/codeql.yml/badge.svg)](https://github.com/sinwe/gradle-hazelcast-plugin/actions/workflows/codeql.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sinwe_gradle-hazelcast-plugin&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sinwe_gradle-hazelcast-plugin)
-[![Gradle Hazelcast Plugin](https://maven-badges.herokuapp.com/maven-central/com.github.sinwe.gradle.caching.hazelcast/gradle-hazelcast-plugin/badge.svg?style=plastic)](http://mvnrepository.com/artifact/com.github.sinwe.gradle.caching.hazelcast/gradle-hazelcast-plugin)
+[![Maven Central Version](https://img.shields.io/maven-central/v/com.github.sinwe.gradle.caching.hazelcast/gradle-hazelcast-plugin?logo=sonatype&logoColor=white)](https://central.sonatype.com/artifact/com.github.sinwe.gradle.caching.hazelcast/gradle-hazelcast-plugin)
 
 [![Java 17 LTS](https://img.shields.io/badge/Java-17%20LTS-blue?logo=openjdk&logoColor=white)](https://github.com/sinwe/gradle-hazelcast-plugin/actions/workflows/build.yml)
 [![Java 21 LTS](https://img.shields.io/badge/Java-21%20LTS-blue?logo=openjdk&logoColor=white)](https://github.com/sinwe/gradle-hazelcast-plugin/actions/workflows/build.yml)

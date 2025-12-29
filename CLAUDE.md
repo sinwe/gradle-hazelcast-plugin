@@ -31,8 +31,8 @@ This is a Gradle settings plugin that enables build caching using Hazelcast as t
 # Publish to local Maven repository for testing
 ./gradlew publishToMavenLocal
 
-# Release workflow (requires credentials)
-./gradlew release  # This creates a git tag and publishes to Sonatype Central Portal
+# Release workflow (requires credentials and JDK 11+)
+./gradlew release  # This creates a git tag, publishes, and closes the staging repository
 
 # Publish manually to Central Portal (for testing)
 ./gradlew publishToSonatype
@@ -40,14 +40,14 @@ This is a Gradle settings plugin that enables build caching using Hazelcast as t
 # Close staging repository (after publishToSonatype)
 ./gradlew closeSonatypeStagingRepository
 
-# Release to Maven Central (after closing)
-./gradlew releaseSonatypeStagingRepository
+# Release to Maven Central (manually after closing - requires separate invocation)
+./gradlew findSonatypeStagingRepository releaseSonatypeStagingRepository
 
-# All-in-one manual publish
-./gradlew publishToSonatype closeSonatypeStagingRepository releaseSonatypeStagingRepository
+# All-in-one manual publish and close
+./gradlew publishToSonatype closeSonatypeStagingRepository
 ```
 
-The release process is automated using the `net.researchgate.release` plugin. After release, the `afterReleaseBuild` task automatically publishes to Sonatype Central Portal using the gradle-nexus/publish-plugin.
+The release process is automated using the `net.researchgate.release` plugin. After release, the `afterReleaseBuild` task automatically publishes and closes the staging repository using gradle-nexus/publish-plugin 2.0.0. You must then manually release via the Portal UI at [central.sonatype.com/publishing/deployments](https://central.sonatype.com/publishing/deployments) or run `releaseSonatypeStagingRepository` separately.
 
 ## Architecture
 
@@ -103,7 +103,7 @@ Key dependencies:
 
 The project uses:
 - Gradle 6.9.4 (via Gradle wrapper)
-- Java 8 source/target compatibility (requires JDK 8 for building)
+- Java 8 source/target compatibility (requires JDK 11+ for building due to gradle-nexus/publish-plugin 2.0.0)
 - `java-gradle-plugin` for automatic plugin metadata generation
 - Plugin ID: `com.github.sinwe.gradle.caching.hazelcast`
 - Group: `com.github.sinwe.gradle.caching.hazelcast`
@@ -111,7 +111,7 @@ The project uses:
 
 ## Publishing Configuration
 
-The project uses the `io.github.gradle-nexus.publish-plugin` (version 1.3.0) for publishing to Sonatype Central Portal. Version 1.3.0 is used for Java 8 compatibility (version 2.x requires Java 11+).
+The project uses the `io.github.gradle-nexus.publish-plugin` (version 2.0.0) for publishing to Sonatype Central Portal.
 
 Publications go to:
 - **Releases/Staging**: `https://ossrh-staging-api.central.sonatype.com/service/local/`

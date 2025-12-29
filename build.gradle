@@ -10,14 +10,14 @@ buildscript {
 
 plugins {
     id "java-gradle-plugin"
-    id "com.jfrog.artifactory" version "4.18.3"
+    id "com.jfrog.artifactory" version "4.24.20"
+    id 'signing'
+    id 'maven-publish'
+    id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
 
 apply plugin: "idea"
 apply plugin: "groovy"
-apply plugin: 'signing'
-apply plugin: "maven-publish"
-apply plugin: "maven"
 apply plugin: 'net.researchgate.release'
 apply plugin: 'org.owasp.dependencycheck'
 apply plugin: 'com.github.ben-manes.versions'
@@ -28,6 +28,10 @@ description = "A simple settings plugin that enables build caching in Gradle wit
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
+test {
+    useJUnitPlatform()
+}
+
 gradlePlugin {
     plugins {
         hazelcastPlugin {
@@ -37,12 +41,109 @@ gradlePlugin {
     }
 }
 
-def localRepo = file("$buildDir/repo")
+def tasksToDisable = []
+
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+ext.sonatypeUsername = hasProperty("sonatypeUsername") ? sonatypeUsername : System.getenv("ORG_GRADLE_PROJECT_sonatypeUsername")
+ext.sonatypePassword = hasProperty("sonatypePassword") ? sonatypePassword : System.getenv("ORG_GRADLE_PROJECT_sonatypePassword")
+
+task sourcesJar(type: Jar) {
+    from sourceSets. main. allJava
+    archiveClassifier = "sources"
+}
+
+task javadocJar(type: Jar, dependsOn: 'javadoc') {
+    from javadoc.destinationDir
+    archiveClassifier = 'javadoc'
+}
 
 publishing {
     publications {
-        jar(MavenPublication) {
+        hazelcastPlugin(MavenPublication) {
             from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom {
+                name = 'Gradle Hazelcast Plugin'
+                description = 'A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend'
+                url = 'https://github.com/sinwe/gradle-hazelcast-plugin'
+
+                scm {
+                    connection = 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
+                    developerConnection = 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
+                    url = 'https://github.com/sinwe/gradle-hazelcast-plugin'
+                }
+
+                licenses {
+                    license {
+                        name = 'Apache License, Version 2.0, January 2004'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.html'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'sinwe'
+                        name = 'Winarto'
+                        email = 'winarto@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = 'MavenLocal'
+            url = uri(mavenLocal().url)
+        }
+    }
+}
+
+// Configure all publications created by java-gradle-plugin
+afterEvaluate {
+    publishing.publications.all {
+        // Skip the hazelcastPlugin publication as it already has metadata configured
+        if (it.name != 'hazelcastPlugin') {
+            pom {
+                name = 'Gradle Hazelcast Plugin'
+                description = 'A simple settings plugin that enables build caching in Gradle with a Hazelcast node as the backend'
+                url = 'https://github.com/sinwe/gradle-hazelcast-plugin'
+
+                scm {
+                    connection = 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
+                    developerConnection = 'scm:git:git@github.com:sinwe/gradle-hazelcast-plugin.git'
+                    url = 'https://github.com/sinwe/gradle-hazelcast-plugin'
+                }
+
+                licenses {
+                    license {
+                        name = 'Apache License, Version 2.0, January 2004'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.html'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'sinwe'
+                        name = 'Winarto'
+                        email = 'winarto@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+            username = sonatypeUsername
+            password = sonatypePassword
         }
     }
 }
@@ -64,15 +165,16 @@ task createClasspathManifest {
 }
 
 dependencies {
-    compile libraries.hazelcastClient
-    testCompile libraries.junit
-    testCompile "org.spockframework:spock-core:1.0-groovy-2.4@jar"
-    testCompile libraries.hazelcast
-    testRuntime files(createClasspathManifest)
+    implementation libraries.hazelcastClient
+    testImplementation libraries.junit
+    testImplementation "org.spockframework:spock-core:1.0-groovy-2.4@jar"
+    testImplementation libraries.hazelcast
+    testRuntimeOnly files(createClasspathManifest)
 }
 
 // --- Configure publications ------------------------------------------
 
+/*
 def buildTagFor(String version) {
     switch (version.substring(version.lastIndexOf("-") + 1)) {
         case "SNAPSHOT":
@@ -83,9 +185,11 @@ def buildTagFor(String version) {
             return "release"
     }
 }
+*/
 
-def targetRepoKey = "libs-${buildTagFor(project.version)}s-local"
+//def targetRepoKey = "libs-${buildTagFor(project.version)}s-local"
 
+/*
 artifactory {
     contextUrl = "https://repo.gradle.org/gradle"
     publish {
@@ -93,7 +197,6 @@ artifactory {
             repoKey = targetRepoKey
             username = project.findProperty("artifactory_user") ?: "nouser"
             password = project.findProperty("artifactory_password") ?: "nopass"
-            maven = true
         }
         defaults {
             publications("jar")
@@ -103,12 +206,9 @@ artifactory {
         repoKey = "repo"
     }
 }
+*/
 
-ext.sonatypeUsername = hasProperty("ossrhUsername") ? ossrhUsername : System.getenv("ossrhUsername")
-
-ext.sonatypePassword = hasProperty("ossrhPassword") ? ossrhPassword : System.getenv("ossrhPassword")
-
-uploadArchives {
+/*uploadArchives {
     repositories {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
@@ -149,27 +249,32 @@ uploadArchives {
             }
         }
     }
-}
+}*/
 
-ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 signing {
     required { isReleaseVersion }
-    sign configurations.archives
+    sign publishing.publications
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: 'javadoc') {
-    from javadoc.destinationDir
-    classifier = 'javadoc'
-}
+/*
 artifacts {
     archives jar
     archives sourcesJar
     archives javadocJar
 }
+*/
 
-afterReleaseBuild.dependsOn uploadArchives
+afterEvaluate {
+    afterReleaseBuild.dependsOn publishToSonatype, closeSonatypeStagingRepository
+}
+
+release {
+    scmAdapters = [net.researchgate.release.GitAdapter]
+    git {
+        requireBranch = ''
+    }
+}
+
+tasksToDisable.each { taskName ->
+    tasks.findByName(taskName)?.enabled = false
+}

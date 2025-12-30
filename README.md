@@ -19,7 +19,7 @@ For an alternative http-based build cache implementation, see [HTTP Build Cache 
 
 Plugin Version | Gradle Version | Hazelcast Version | Minimum JDK | Tested JDK LTS Versions | Build JDK | Notes
 -------------- | -------------- | ----------------- | ----------- | ----------------------- | --------- | -----
-0.17+          | 9.2+           | 5.6.0             | 17          | 17, 21, 25              | 17+       | **Gradle 9 requires Java 17+**, Hazelcast 5.6+ officially supports Java 17, tested on all LTS versions via CI
+0.17+          | 8.14 - 9.2+    | 5.6.0             | 17          | 17, 21, 25              | 17+       | **Gradle 9 requires Java 17+**, Hazelcast 5.6+ officially supports Java 17, tested against Gradle 8.14, 8.14.1, 9.0.0, 9.1.0, 9.2.0, 9.2.1 in CI
 0.16           | 8.14+          | 3.10.2            | 8           | 8, 11, 17               | 11+       | Gradle 8.14, Java 8 bytecode, Hazelcast 3.10 not officially supported on Java 17
 0.15           | 7.6+           | 3.10.2            | 8           | 8, 11                   | 11+       | Sonatype Central Portal support with gradle-nexus plugin 2.0.0
 0.14           | 6.0+           | 3.10.2            | 8           | 8, 11                   | 8+        | Legacy OSSRH publishing

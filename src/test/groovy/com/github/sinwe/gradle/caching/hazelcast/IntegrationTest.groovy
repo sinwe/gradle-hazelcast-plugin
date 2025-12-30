@@ -4,12 +4,25 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Specification
 import spock.lang.TempDir
+import spock.lang.Unroll
 
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class IntegrationTest extends Specification {
+    // Gradle versions to test against (only GA releases)
+    // Note: Use full version numbers (e.g., "9.0.0", not "9.0") as Gradle downloads require exact versions
+    //
+    // Gradle 8.x: Testing 8.14+ (minimum for v0.16, last 8.x version before 9.0)
+    // Gradle 9.x: All GA releases (current plugin targets 9.2+)
+    static final List<String> GRADLE_VERSIONS = [
+        // Gradle 8.x series (last stable releases before 9.0)
+        "8.14", "8.14.1",
+
+        // Gradle 9.x series (all GA releases)
+        "9.0.0", "9.1.0", "9.2.0", "9.2.1"
+    ]
     public static final int HAZELCAST_PORT = 5710
     public static final String ORIGINAL_HELLO_WORLD = """
             public class Hello {
@@ -33,6 +46,7 @@ class IntegrationTest extends Specification {
     List<String> cachedTasks
     List<String> executedTasks
     HazelcastService hazelcastService
+    String currentGradleVersion
 
     def setup() {
         hazelcastService = new HazelcastService(HAZELCAST_PORT)
@@ -75,7 +89,11 @@ class IntegrationTest extends Specification {
         hazelcastService?.stop()
     }
 
-    def "no task is re-executed when inputs are unchanged"() {
+    @Unroll
+    def "no task is re-executed when inputs are unchanged - Gradle #gradleVersion"() {
+        given:
+        currentGradleVersion = gradleVersion
+
         when:
         succeeds "compileJava"
         then:
@@ -88,22 +106,38 @@ class IntegrationTest extends Specification {
         succeeds "compileJava"
         then:
         cachedTasks.containsAll ":compileJava"
+
+        where:
+        gradleVersion << GRADLE_VERSIONS
     }
 
-    def "outputs are correctly loaded from cache"() {
+    @Unroll
+    def "outputs are correctly loaded from cache - Gradle #gradleVersion"() {
+        given:
+        currentGradleVersion = gradleVersion
         buildFile << """
             apply plugin: "application"
             application {
                 mainClass = "Hello"
             }
         """
+
+        when:
         succeeds "run"
         succeeds "clean"
-        expect:
+
+        then:
         succeeds "run"
+
+        where:
+        gradleVersion << GRADLE_VERSIONS
     }
 
-    def "tasks get cached when source code changes back to previous state"() {
+    @Unroll
+    def "tasks get cached when source code changes back to previous state - Gradle #gradleVersion"() {
+        given:
+        currentGradleVersion = gradleVersion
+
         expect:
         succeeds "compileJava"
         executedTasks.containsAll ":compileJava"
@@ -121,34 +155,54 @@ class IntegrationTest extends Specification {
         then:
         succeeds "compileJava"
         cachedTasks.containsAll ":compileJava"
+
+        where:
+        gradleVersion << GRADLE_VERSIONS
     }
 
-    def "clean doesn't get cached"() {
-        succeeds "assemble"
-        succeeds "clean"
-        succeeds "assemble"
+    @Unroll
+    def "clean doesn't get cached - Gradle #gradleVersion"() {
+        given:
+        currentGradleVersion = gradleVersion
+
         when:
+        succeeds "assemble"
         succeeds "clean"
+        succeeds "assemble"
+        succeeds "clean"
+
         then:
         executedTasks.contains ":clean"
+
+        where:
+        gradleVersion << GRADLE_VERSIONS
     }
 
-    def "cacheable task with cache disabled doesn't get cached"() {
+    @Unroll
+    def "cacheable task with cache disabled doesn't get cached - Gradle #gradleVersion"() {
+        given:
+        currentGradleVersion = gradleVersion
         buildFile << """
             compileJava.outputs.cacheIf { false }
         """
 
-        succeeds "compileJava"
-        succeeds "clean"
-
         when:
         succeeds "compileJava"
+        succeeds "clean"
+        succeeds "compileJava"
+
         then:
         // :compileJava is not cached, but :jar is still cached as its inputs haven't changed
         executedTasks.contains ":compileJava"
+
+        where:
+        gradleVersion << GRADLE_VERSIONS
     }
 
-    def "non-cacheable task with cache enabled gets cached"() {
+    @Unroll
+    def "non-cacheable task with cache enabled gets cached - Gradle #gradleVersion"() {
+        given:
+        currentGradleVersion = gradleVersion
         new File(testProjectDir, "input.txt").text = "data"
         buildFile << """
             class NonCacheableTask extends DefaultTask {
@@ -178,17 +232,26 @@ class IntegrationTest extends Specification {
         succeeds "compileJava"
         then:
         cachedTasks.contains ":customTask"
+
+        where:
+        gradleVersion << GRADLE_VERSIONS
     }
 
     BuildResult succeeds(String... tasks) {
         arguments.add "--build-cache"
         arguments.add "--stacktrace"
         arguments.addAll tasks
-        def result = GradleRunner.create()
+        def runner = GradleRunner.create()
             .forwardOutput()
             .withProjectDir(testProjectDir)
             .withArguments(arguments)
-            .build()
+
+        // Use specific Gradle version if set, otherwise use wrapper version
+        if (currentGradleVersion) {
+            runner.withGradleVersion(currentGradleVersion)
+        }
+
+        def result = runner.build()
         assert result.taskPaths(FAILED).empty
         cachedTasks = result.taskPaths(FROM_CACHE)
         executedTasks = result.taskPaths(SUCCESS)

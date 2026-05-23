@@ -18,10 +18,10 @@ class IntegrationTest extends Specification {
     // Gradle 9.x: All GA releases (current plugin targets 9.2+)
     static final List<String> GRADLE_VERSIONS = [
         // Gradle 8.x series (last stable releases before 9.0)
-        "8.14", "8.14.1",
+        "8.14.2",
 
         // Gradle 9.x series (all GA releases)
-        "9.0.0", "9.1.0", "9.2.0", "9.2.1"
+        "9.0.0", "9.1.0", "9.2.1", "9.3.1", "9.4.1", "9.5.1"
     ]
     public static final int HAZELCAST_PORT = 5710
     public static final String ORIGINAL_HELLO_WORLD = """
@@ -47,6 +47,7 @@ class IntegrationTest extends Specification {
     List<String> executedTasks
     HazelcastService hazelcastService
     String currentGradleVersion
+    String cacheName = UUID.randomUUID().toString()
 
     def setup() {
         hazelcastService = new HazelcastService(HAZELCAST_PORT)
@@ -69,6 +70,7 @@ class IntegrationTest extends Specification {
                 remote($HazelcastBuildCache.name) {
                     port = $HAZELCAST_PORT
                     push = true
+                    name = '$cacheName'
                 }
             }
         """

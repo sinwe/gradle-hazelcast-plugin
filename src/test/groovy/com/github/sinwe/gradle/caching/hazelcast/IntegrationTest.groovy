@@ -14,15 +14,17 @@ class IntegrationTest extends Specification {
     // Gradle versions to test against (only GA releases)
     // Note: Use full version numbers (e.g., "9.0.0", not "9.0") as Gradle downloads require exact versions
     //
-    // Gradle 8.x: Testing 8.14+ (minimum for v0.16, last 8.x version before 9.0)
-    // Gradle 9.x: All GA releases (current plugin targets 9.2+)
-    static final List<String> GRADLE_VERSIONS = [
-        // Gradle 8.x series (last stable releases before 9.0)
+    // Gradle 8.x: Excluded on JDK 25+ — Gradle 8.x bundles ASM 9.7.1 which only supports class files up to JDK 24.
+    // Gradle 9.x: All GA releases (current plugin targets 9.2+); Gradle 9.1+ supports JDK 25.
+    static final List<String> GRADLE_VERSIONS = ([
+        // Gradle 8.x series (last stable release before 9.0)
         "8.14.2",
 
         // Gradle 9.x series (all GA releases)
         "9.0.0", "9.1.0", "9.2.1", "9.3.1", "9.4.1", "9.5.1"
-    ]
+    ] as List<String>).findAll { String version ->
+        version.startsWith("9.") || Runtime.version().feature() < 25
+    }
     public static final int HAZELCAST_PORT = 5710
     public static final String ORIGINAL_HELLO_WORLD = """
             public class Hello {

@@ -9,17 +9,19 @@
 [![Java 21 LTS](https://img.shields.io/badge/Java-21%20LTS-blue?logo=openjdk&logoColor=white)](https://github.com/sinwe/gradle-hazelcast-plugin/actions/workflows/build.yml)
 [![Java 25 LTS](https://img.shields.io/badge/Java-25%20LTS-blue?logo=openjdk&logoColor=white)](https://github.com/sinwe/gradle-hazelcast-plugin/actions/workflows/build.yml)
 
-A simple [settings plugin](https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html) that enables [build caching](https://guides.gradle.org/using-build-cache/) in Gradle with a [Hazelcast](http://hazelcast.org) node as the backend. The Hazelcast node itself needs to be set up separately.
+A simple [settings plugin](https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html) that enables [build caching](https://guides.gradle.org/using-build-cache/) in Gradle with Hazelcast as the backend.
 
-For a production-ready build cache implementation (featuring node management, usage statistics, health monitoring, replication, access control and more), see [Gradle Enteprise](https://gradle.com/build-cache).
+For a production-ready build cache implementation (featuring node management, usage statistics, health monitoring, replication, access control and more), see [Gradle Enteprise](https://gradle.com/enterprise).
 
 For an alternative http-based build cache implementation, see [HTTP Build Cache Server](https://github.com/sinwe/http-gradle-cache-server)
+
+---
 
 ## Version Compatibility Matrix
 
 Plugin Version | Gradle Version | Hazelcast Version | Minimum JDK | Tested JDK LTS Versions | Build JDK | Notes
 -------------- | -------------- | ----------------- | ----------- | ----------------------- | --------- | -----
-0.17+          | 8.14 - 9.2+    | 5.6.0             | 17          | 17, 21, 25              | 17+       | **Gradle 9 requires Java 17+**, Hazelcast 5.6+ officially supports Java 17, tested against Gradle 8.14, 8.14.1, 9.0.0, 9.1.0, 9.2.0, 9.2.1 in CI
+0.17+          | 8.14 - 9.2+    | 5.6.0             | 17          | 17, 21, 25              | 17+       | **Gradle 9 requires Java 17+**, Hazelcast 5.6+ officially supports Java 17, tested against JDK 21, 25 LTS versions
 0.16           | 8.14+          | 3.10.2            | 8           | 8, 11, 17               | 11+       | Gradle 8.14, Java 8 bytecode, Hazelcast 3.10 not officially supported on Java 17
 0.15           | 7.6+           | 3.10.2            | 8           | 8, 11                   | 11+       | Sonatype Central Portal support with gradle-nexus plugin 2.0.0
 0.14           | 6.0+           | 3.10.2            | 8           | 8, 11                   | 8+        | Legacy OSSRH publishing
@@ -30,7 +32,9 @@ Plugin Version | Gradle Version | Hazelcast Version | Minimum JDK | Tested JDK L
 - **Tested JDK LTS Versions**: The LTS JDK versions that the plugin is known to work with. Version 0.17+ is tested in CI on all listed versions in parallel on every commit
 - **Build JDK**: JDK version required to build/release the plugin itself (relevant for contributors)
 - **Hazelcast Version**: Version of Hazelcast library used by the plugin. Note that you'll need to run a compatible Hazelcast server separately
-- **Important for v0.17+**: Gradle 9 dropped support for Java 8-16. You must have JDK 17+ installed to run Gradle 9, even though the plugin could theoretically compile to Java 8 bytecode. Since users must have Java 17+ anyway, the plugin now targets Java 17 bytecode to take advantage of modern Java features. Additionally, Hazelcast was upgraded from 3.10.2 to 5.6.0 for official Java 17 support.
+- **Important for v0.17+**: Gradle 9 dropped support for Java 8-16. You must have JDK 17+ installed to run Gradle 9, even though the plugin could theoretically compile to Java 8 bytecode. Since usage of Gradle 9 mandates JDK 17+, the matrix reflects this requirement.
+
+---
 
 ## How to use
 
@@ -68,3 +72,9 @@ System property                                  | Function                     
 `com.github.sinwe.gradle.caching.hazelcast.host` | host name of the Hazelcast node | `127.0.0.1`
 `com.github.sinwe.gradle.caching.hazelcast.port` | TCP port of the Hazelcast node  | `5701`
 `com.github.sinwe.gradle.caching.hazelcast.name` | name of the cache               | `gradle-task-cache`
+
+---
+
+## Additional Resources
+
+For detailed setup instructions, refer to the [SETUP.md](https://github.com/sinwe/gradle-hazelcast-plugin/blob/master/SETUP.md) file.

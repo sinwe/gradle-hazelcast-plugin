@@ -53,7 +53,7 @@ The `gradle-hazelcast-plugin` will interact with the Hazelcast cluster. Follow t
 
 ```gradle
 plugins {
-    id 'com.github.xander.plugins.gradle-hazelcast' version '1.0.0' // Replace with actual version
+    id 'com.github.sinwe.gradle.caching.hazelcast' version '0.18-SNAPSHOT' // Replace with actual version
 }
 ```
 

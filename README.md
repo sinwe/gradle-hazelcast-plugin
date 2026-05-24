@@ -21,7 +21,8 @@ For an alternative http-based build cache implementation, see [HTTP Build Cache 
 
 Plugin Version | Gradle Version | Hazelcast Version | Minimum JDK | Tested JDK LTS Versions | Build JDK | Notes
 -------------- | -------------- | ----------------- | ----------- | ----------------------- | --------- | -----
-0.17+          | 8.14 - 9.2+    | 5.6.0             | 17          | 17, 21, 25              | 17+       | **Gradle 9 requires Java 17+**, Hazelcast 5.6+ officially supports Java 17, tested against JDK 21, 25 LTS versions
+0.18+          | 8.14.2, 9.0 - 9.5+ | 5.6.0        | 17          | 17, 21, 25              | 17+       | **Gradle 9 requires Java 17+**; Gradle 8.x only tested on JDK 17/21 (Gradle 8.x bundles ASM 9.7.1 which does not support JDK 25)
+0.17           | 8.14 - 9.2     | 5.6.0             | 17          | 17, 21, 25              | 17+       | Gradle 9 requires Java 17+, Hazelcast 5.6+ officially supports Java 17
 0.16           | 8.14+          | 3.10.2            | 8           | 8, 11, 17               | 11+       | Gradle 8.14, Java 8 bytecode, Hazelcast 3.10 not officially supported on Java 17
 0.15           | 7.6+           | 3.10.2            | 8           | 8, 11                   | 11+       | Sonatype Central Portal support with gradle-nexus plugin 2.0.0
 0.14           | 6.0+           | 3.10.2            | 8           | 8, 11                   | 8+        | Legacy OSSRH publishing
@@ -32,7 +33,7 @@ Plugin Version | Gradle Version | Hazelcast Version | Minimum JDK | Tested JDK L
 - **Tested JDK LTS Versions**: The LTS JDK versions that the plugin is known to work with. Version 0.17+ is tested in CI on all listed versions in parallel on every commit
 - **Build JDK**: JDK version required to build/release the plugin itself (relevant for contributors)
 - **Hazelcast Version**: Version of Hazelcast library used by the plugin. Note that you'll need to run a compatible Hazelcast server separately
-- **Important for v0.17+**: Gradle 9 dropped support for Java 8-16. You must have JDK 17+ installed to run Gradle 9, even though the plugin could theoretically compile to Java 8 bytecode. Since usage of Gradle 9 mandates JDK 17+, the matrix reflects this requirement.
+- **Important for v0.18+**: Gradle 9 dropped support for Java 8-16. You must have JDK 17+ installed to run Gradle 9. Gradle 8.x is tested only on JDK 17 and 21 — Gradle 8.x ships with ASM 9.7.1 which only supports class files up to JDK 24 (major version 68); JDK 25 support requires Gradle 9.1+.
 
 ---
 

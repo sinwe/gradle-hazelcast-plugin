@@ -21,7 +21,7 @@ class IntegrationTest extends Specification {
         "8.14.2",
 
         // Gradle 9.x series (all GA releases)
-        "9.0.0", "9.1.0", "9.2.1", "9.3.1", "9.4.1", "9.5.1"
+        "9.0.0", "9.1.0", "9.2.1", "9.3.1", "9.4.1", "9.5.1", "9.6.1", "9.7.1"
     ] as List<String>).findAll { String version ->
         version.startsWith("9.") || Runtime.version().feature() < 25
     }
